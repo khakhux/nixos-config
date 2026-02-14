@@ -1,10 +1,18 @@
 { config, lib, pkgs, ... }:
 
+let
+  envs = import ./user.nix;
+in
+
 {
   imports = [
     (import ../../modules-dev/configuration.nix { 
       inherit config lib pkgs;
       envFilePath = ./user.nix; 
+    })
+    (import ../../modules/wsl.nix { 
+      inherit config pkgs;
+      mainUser = envs.mainUser; 
     })
   ];
 
@@ -31,6 +39,7 @@
     #    -Dawt.useSystemAAFontSettings=lcd \
     #    "$@"
     #'')
+    #recoll
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
