@@ -39,7 +39,7 @@ in
     #    -Dawt.useSystemAAFontSettings=lcd \
     #    "$@"
     #'')
-    #recoll
+    gocatcli
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
@@ -48,4 +48,7 @@ in
   #  options = [ "bind" ];
   #};  
   
+  systemd.tmpfiles.rules = [
+    "L+ /workspaces - - - - ${config.users.users.${envs.mainUser}.home}/workspaces"
+  ];
 }
