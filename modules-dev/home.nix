@@ -17,6 +17,7 @@ in
     enable = true;
     shellAliases = { 
       hello = "echo Hello, ${mainUser}!";
+      idea-java21 = "cd /workspaces/nixos-config/dev-envs/java21 && nix develop --command idea-ultimate";
     };
     initExtra = ''
       nrs() {

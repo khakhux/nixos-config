@@ -37,9 +37,21 @@
         buildInputs = [
           jdk21-pinned
           maven386-jdk21
+          pkgs.jetbrains.idea-ultimate
         ];
         
         shellHook = ''
+          # Create stable symlinks for IntelliJ IDEA
+          mkdir -p ~/.jdks
+          mkdir -p ~/.m2
+          mkdir -p ~/.config/nixos-cacerts
+          
+          # Link JDK 21.0.3 to a stable path (point to lib/openjdk for IntelliJ)
+          ln -sfn ${jdk21-pinned}/lib/openjdk ~/.jdks/java21-pinned
+          
+          # Link Maven 3.8.6 to a stable path
+          ln -sfn ${maven386-jdk21} ~/.m2/maven-pinned
+                  
           echo "Java Development Environment"
           echo "=============================="
           java -version
@@ -48,10 +60,23 @@
           echo ""
           echo "Environment variables:"
           echo "JAVA_HOME: $JAVA_HOME"
+          echo ""
+          echo "Stable paths created for IntelliJ IDEA:"
+          echo "  JDK:   ~/.jdks/java21-pinned"
+          echo "  Maven: ~/.m2/maven-pinned"
+          echo ""
+          echo "To configure IntelliJ IDEA:"
+          echo "  1. File → Project Structure → SDKs → Add JDK"
+          echo "     Path: $HOME/.jdks/java21-pinned"
+          echo "  2. File → Settings → Build Tools → Maven"
+          echo "     Maven home: $HOME/.m2/maven-pinned"
+          echo ""
+          echo "To launch IntelliJ IDEA:"
+          echo "  idea-ultimate"
         '';
         
-        # Set JAVA_HOME for tools that need it
         JAVA_HOME = "${jdk21-pinned}";
+        M2_HOME = "${maven386-jdk21}";
       };
     };
 }
