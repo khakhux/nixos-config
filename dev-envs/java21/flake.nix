@@ -3,16 +3,23 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-jdk2102.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixpkgs-maven386.url = "github:NixOS/nixpkgs/nixos-22.11";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-jdk2102, nixpkgs-maven386 }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-jdk2102, nixpkgs-maven386 }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
         inherit system; 
         config.allowUnfree = true; 
+      };
+      
+      # Import IntelliJ IDEA from unstable
+      pkgs-unstable = import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
       };
       
       # Import pinned JDK 21 from nixos-24.05
@@ -37,7 +44,7 @@
         buildInputs = [
           jdk21-pinned
           maven386-jdk21
-          pkgs.jetbrains.idea-ultimate
+          pkgs-unstable.jetbrains.idea
         ];
         
         shellHook = ''
@@ -72,7 +79,7 @@
           echo "     Maven home: $HOME/.m2/maven-pinned"
           echo ""
           echo "To launch IntelliJ IDEA:"
-          echo "  idea-ultimate"
+          echo "  idea"
         '';
         
         JAVA_HOME = "${jdk21-pinned}";
