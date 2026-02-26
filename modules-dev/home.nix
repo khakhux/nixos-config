@@ -1,7 +1,7 @@
 { config, pkgs, envFilePath, ... }:
 
 let
-  mavenSettingsRepo = pkgs.fetchgit {
+  metodologiaRepo = pkgs.fetchgit {
     url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
     rev = "master"; #"61841ca3b665c3e667b3a4bdac03db8217de5fb3";  # specific commit hash
     sha256 = "sha256-eNWSqXz54TZQAzLobmRiLqSYYkDtsCf2ArHsNS/ndHc=";
@@ -17,7 +17,7 @@ in
     enable = true;
     shellAliases = { 
       hello = "echo Hello, ${mainUser}!";
-      idea-java21 = "cd /workspaces/nixos-config/dev-envs/java21 && nix develop --command idea-ultimate";
+      idea-java21 = "cd /workspaces/nixos-config/dev-envs/java21 && nix develop --command idea";
     };
     initExtra = ''
       nrs() {
@@ -50,5 +50,6 @@ in
       cat ${./cacerts/CARaiz.pem} >> $out
     '';
   };
-  home.file.".m2/settings.xml".source = "${mavenSettingsRepo}/maven/settings.xml";
+  home.file.".m2/settings.xml".source = "${metodologiaRepo}/maven/settings.xml";
+  home.file."metodologia/formatter-sgife.xml".source = "${metodologiaRepo}/formatter-sgife.xml";
 }
