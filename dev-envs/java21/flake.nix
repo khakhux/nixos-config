@@ -45,6 +45,7 @@
           jdk21-pinned
           maven386-jdk21
           pkgs-unstable.jetbrains.idea
+          pkgs.nodejs # para sonar
         ];
         
         shellHook = ''
