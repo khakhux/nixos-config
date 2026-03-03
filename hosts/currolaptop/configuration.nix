@@ -40,6 +40,7 @@ in
     #    "$@"
     #'')
     gocatcli
+    clipse # clipboard manager https://github.com/savedra1/clipse
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
@@ -51,4 +52,16 @@ in
   systemd.tmpfiles.rules = [
     "L+ /workspaces - - - - ${config.users.users.${envs.mainUser}.home}/workspaces"
   ];
+
+  # Clipse clipboard manager listener service
+  systemd.user.services.clipse-listener = {
+    description = "Clipse clipboard manager listener";
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.clipse}/bin/clipse --listen";
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
 }
