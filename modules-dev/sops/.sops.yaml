@@ -1,0 +1,30 @@
+# SOPS configuration file
+# This file defines encryption rules for sensitive files in git repositories
+# This file contains the public AGE key and is safe to commit to git
+creation_rules:
+    # Rule for YAML files - encrypt only keys ending with _enc
+    - path_regex: \.(yaml|yml)$
+      encrypted_regex: ^.*_enc$
+      age: age1wt0nlv2q4mk3s25y2rg3kkdzpd7ajxvrznvtepqk6kztfpetyawqsvgu72
+    # Rule for properties files - encrypt only keys ending with _enc
+    # Note: SOPS treats .properties as dotenv format for selective encryption
+    - path_regex: \.properties$
+      encrypted_regex: ^.*_enc$
+      age: age1wt0nlv2q4mk3s25y2rg3kkdzpd7ajxvrznvtepqk6kztfpetyawqsvgu72
+# To get your age public key, run:
+# age-keygen -y ~/.config/sops/age/keys.txt
+sops:
+    age:
+        - recipient: age1wt0nlv2q4mk3s25y2rg3kkdzpd7ajxvrznvtepqk6kztfpetyawqsvgu72
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBrZjVidmJXNitXb1dsTFBk
+            angvMDBKbjcrM0NXTXpKVm5QbEEyTkorMEhZCk5xSFFKbkp6Mm1nOVRVQ2JzSXl6
+            Ym5FQU03RUxHQXJpdGtET25WdHVOUDAKLS0tIGJpUklNUFU3OFlFSFl4VTZRV2t6
+            aFVHZXBBN2ZjZzViT2dOZUxubk0wN0UKz8GHF7u+YQ6KrVJtjchXhhNmTStJwR6S
+            jxnmIiRg6dmwhQigyYVdiAYZPL5Ja5fI60N8dPHfuoNMf52c+ZfAog==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-03-05T05:55:13Z"
+    mac: ENC[AES256_GCM,data:E+9D2s5I8tJ7Lg0eXCoCTi7kM7rECiYW2soPGZmQBoN6Xu8PZTDbWhnKNwkXCZHpx98F62k5SkdlV24TpZZAWslXLglhmTalQWgUdAsf771qan8CgPDcqLJm1YR4w0Y2MHpWqyzP4B7cNUPXR8r9dkhW3IQCm9iyK5guwXRPKPI=,iv:73VaimLaC1J7NCy88v+VnLlcuyQ0wkJfmf3MQW8G2+M=,tag:6UNQ2eOoLNahZV8qtBkkhw==,type:str]
+    encrypted_regex: ^.*_enc$
+    version: 3.11.0

@@ -1,0 +1,9 @@
+# SOPS clean/smudge filters for sensitive file types
+
+# Exclude .sops.yaml from encryption
+.sops.yaml -filter -diff
+.gitlab-ci.yml -filter -diff
+
+*.properties filter=sops-dotenv diff=sops
+*.yaml       filter=sops-yaml diff=sops
+*.yml        filter=sops-yaml diff=sops

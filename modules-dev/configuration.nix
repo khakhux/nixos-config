@@ -69,6 +69,8 @@ EOF
     wget
     jq
     keystore-explorer
+    sops
+    age
     #keepassxc
     #dbvisualizer
     #postman

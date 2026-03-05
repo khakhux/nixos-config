@@ -13,6 +13,13 @@ in
   home.username = mainUser;
   home.homeDirectory = "/home/${mainUser}";
   home.stateVersion = "25.05";
+
+  # Environment variables for SOPS
+  home.sessionVariables = {
+    SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
+    SOPS_CONFIG = "$HOME/workspaces/.sops.yaml";
+    PATH = "$HOME/workspaces/sops:$PATH";
+  };
   programs.bash = {
     enable = true;
     shellAliases = { 
@@ -35,6 +42,8 @@ in
       pull.rebase = false;
       init.defaultBranch = "main";
       http.sslCAInfo = "${config.home.homeDirectory}/.config/nixos-cacerts/ca-bundle.crt";
+      core.attributesFile = "${config.home.homeDirectory}/.gitattributes";
+      include.path = "${config.home.homeDirectory}/.config/git/firma-git-config";
     };
     aliases = {
       # mixed: unstages the changes but keeps them in your working directory
@@ -50,6 +59,37 @@ in
       cat ${./cacerts/CARaiz.pem} >> $out
     '';
   };
+
+  # Deploy SOPS configuration files
+  home.file.".config/git/firma-git-config".source = ./git-config/firma-git-config;
+  home.file.".gitattributes".source = ./git-config/.gitattributes;
+  home.file."/workspaces/.sops.yaml".source = ./sops/.sops.yaml;
+  home.file."/workspaces/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
+  home.file."/workspaces/sops/sops-smudge.sh".source = ./sops/sops-smudge.sh;
+
+  # Future: Download from metodologiaRepo instead of local files
+  # Uncomment when files are available in metodologia repository:
+  # home.file.".config/git/sops-config".source = "${metodologiaRepo}/firma-git-config";
+  # home.file.".gitattributes".source = "${metodologiaRepo}/.gitattributes";
+  # home.file."/workspaces/.sops.yaml".source = "${metodologiaRepo}/.sops.yaml";
+
   home.file.".m2/settings.xml".source = "${metodologiaRepo}/maven/settings.xml";
   home.file."metodologia/formatter-sgife.xml".source = "${metodologiaRepo}/formatter-sgife.xml";
+
+  # Generate age key if it doesn't exist
+  home.activation.generateAgeKey = config.lib.dag.entryAfter ["writeBoundary"] ''
+    AGE_KEY_DIR="${config.home.homeDirectory}/.config/sops/age"
+    AGE_KEY_FILE="$AGE_KEY_DIR/keys.txt"
+    
+    if [ ! -f "$AGE_KEY_FILE" ]; then
+      $DRY_RUN_CMD mkdir -p "$AGE_KEY_DIR"
+      $DRY_RUN_CMD chmod 700 "$AGE_KEY_DIR"
+      $DRY_RUN_CMD ${pkgs.age}/bin/age-keygen -o "$AGE_KEY_FILE"
+      $DRY_RUN_CMD chmod 600 "$AGE_KEY_FILE"
+      echo "Age key generated at $AGE_KEY_FILE"
+      echo "Your public key is:"
+      $DRY_RUN_CMD ${pkgs.age}/bin/age-keygen -y "$AGE_KEY_FILE"
+      echo "Add this public key to .sops.yaml in your repositories"
+    fi
+  '';
 }
