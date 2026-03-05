@@ -1,11 +1,19 @@
 { config, pkgs, envFilePath, ... }:
 
 let
+  #metodologiaRepo = builtins.fetchGit {
+  #  url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
+  #  ref = "master";
+  #  rev = "f8fe6b59859ebd2e7bdfa2686338bf4a6825b8b0";  # specific commit hash
+  #};
   metodologiaRepo = pkgs.fetchgit {
     url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
-    rev = "master"; #"61841ca3b665c3e667b3a4bdac03db8217de5fb3";  # specific commit hash
-    sha256 = "sha256-eNWSqXz54TZQAzLobmRiLqSYYkDtsCf2ArHsNS/ndHc=";
+    rev = "f8fe6b59859ebd2e7bdfa2686338bf4a6825b8b0";
+    #sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    #sha256 = "sha256-eNWSqXz54TZQAzLobmRiLqSYYkDtsCf2ArHsNS/ndHc=";
+    sha256 = "sha256-6YThJuA4jAZFavGgyh1WgM3olvtsJcGmfQ9OG7fQ9T0=";
   };
+
   envs = import envFilePath;
   mainUser = envs.mainUser; 
 in
@@ -17,8 +25,8 @@ in
   # Environment variables for SOPS
   home.sessionVariables = {
     SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
-    SOPS_CONFIG = "$HOME/workspaces/.sops.yaml";
-    PATH = "$HOME/workspaces/sops:$PATH";
+    SOPS_CONFIG = "$HOME/.config/sops/.sops.yaml";
+    PATH = "$HOME/.config/sops:$PATH";
   };
   programs.bash = {
     enable = true;
@@ -42,7 +50,7 @@ in
       pull.rebase = false;
       init.defaultBranch = "main";
       http.sslCAInfo = "${config.home.homeDirectory}/.config/nixos-cacerts/ca-bundle.crt";
-      core.attributesFile = "${config.home.homeDirectory}/.gitattributes";
+      core.attributesFile = "${config.home.homeDirectory}/.config/git/.gitattributes";
       include.path = "${config.home.homeDirectory}/.config/git/firma-git-config";
     };
     aliases = {
@@ -61,20 +69,34 @@ in
   };
 
   # Deploy SOPS configuration files
-  home.file.".config/git/firma-git-config".source = ./git-config/firma-git-config;
-  home.file.".gitattributes".source = ./git-config/.gitattributes;
-  home.file."/workspaces/.sops.yaml".source = ./sops/.sops.yaml;
-  home.file."/workspaces/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
-  home.file."/workspaces/sops/sops-smudge.sh".source = ./sops/sops-smudge.sh;
-
-  # Future: Download from metodologiaRepo instead of local files
-  # Uncomment when files are available in metodologia repository:
-  # home.file.".config/git/sops-config".source = "${metodologiaRepo}/firma-git-config";
-  # home.file.".gitattributes".source = "${metodologiaRepo}/.gitattributes";
-  # home.file."/workspaces/.sops.yaml".source = "${metodologiaRepo}/.sops.yaml";
+  #home.file.".config/git/firma-git-config".source = ./git-config/firma-git-config;
+  #home.file.".gitattributes".source = ./git-config/.gitattributes;
+  #home.file."/workspaces/.sops.yaml".source = ./sops/.sops.yaml;
+  #home.file."/workspaces/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
+  #home.file."/workspaces/sops/sops-smudge.sh".source = ./sops/sops-smudge.sh;
 
   home.file.".m2/settings.xml".source = "${metodologiaRepo}/maven/settings.xml";
   home.file."metodologia/formatter-sgife.xml".source = "${metodologiaRepo}/formatter-sgife.xml";
+
+  home.file."/.config/git/firma-git-config".source = "${metodologiaRepo}/git-config/firma-git-config";
+  home.file."/.config/git/.gitattributes".source = "${metodologiaRepo}/git-config/.gitattributes";
+  home.file."/.config/sops/.sops.yaml".source = "${metodologiaRepo}/sops/.sops.yaml";
+  home.file."/.config/sops/sops-clean.sh" = {
+    source = "${metodologiaRepo}/sops/sops-clean.sh";
+    executable = true;
+  };
+  home.file."/.config/sops/sops-smudge.sh" = {
+    source = "${metodologiaRepo}/sops/sops-smudge.sh";
+    executable = true;
+  };
+    home.file."/.config/sops/test-sops-yaml.sh" = {
+    source = "${metodologiaRepo}/sops/test-sops-yaml.sh";
+    executable = true;
+  };
+  home.file."/.config/sops/test-sops-properties.sh" = {
+    source = "${metodologiaRepo}/sops/test-sops-properties.sh";
+    executable = true;
+  };
 
   # Generate age key if it doesn't exist
   home.activation.generateAgeKey = config.lib.dag.entryAfter ["writeBoundary"] ''
