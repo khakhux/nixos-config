@@ -8,10 +8,9 @@ let
   #};
   metodologiaRepo = pkgs.fetchgit {
     url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
-    rev = "f8fe6b59859ebd2e7bdfa2686338bf4a6825b8b0";
-    #sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    #sha256 = "sha256-eNWSqXz54TZQAzLobmRiLqSYYkDtsCf2ArHsNS/ndHc=";
-    sha256 = "sha256-6YThJuA4jAZFavGgyh1WgM3olvtsJcGmfQ9OG7fQ9T0=";
+    rev = "b3cd611c45d94b744fec553872a9c32b8322c357";
+    # nix run nixpkgs#nix-prefetch-git -- $url --rev $rev | grep hash
+    sha256 = "sha256-qyjnIXGeK8uYfSN1A+vdhml/eZ/b2vGI9QdclTOEtvg=";
   };
 
   envs = import envFilePath;
@@ -68,23 +67,19 @@ in
     '';
   };
 
-  # Deploy SOPS configuration files
-  #home.file.".config/git/firma-git-config".source = ./git-config/firma-git-config;
-  #home.file.".gitattributes".source = ./git-config/.gitattributes;
-  #home.file."/workspaces/.sops.yaml".source = ./sops/.sops.yaml;
-  #home.file."/workspaces/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
-  #home.file."/workspaces/sops/sops-smudge.sh".source = ./sops/sops-smudge.sh;
-
   home.file.".m2/settings.xml".source = "${metodologiaRepo}/maven/settings.xml";
   home.file."metodologia/formatter-sgife.xml".source = "${metodologiaRepo}/formatter-sgife.xml";
 
   home.file."/.config/git/firma-git-config".source = "${metodologiaRepo}/git-config/firma-git-config";
+  #home.file."/.config/git/.gitattributes".source = ./git-config/.gitattributes;
   home.file."/.config/git/.gitattributes".source = "${metodologiaRepo}/git-config/.gitattributes";
   home.file."/.config/sops/.sops.yaml".source = "${metodologiaRepo}/sops/.sops.yaml";
+  #home.file."/.config/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
   home.file."/.config/sops/sops-clean.sh" = {
     source = "${metodologiaRepo}/sops/sops-clean.sh";
     executable = true;
   };
+  #home.file."/.config/sops/sops-smudge.sh".source = ./sops/sops-smudge.sh;
   home.file."/.config/sops/sops-smudge.sh" = {
     source = "${metodologiaRepo}/sops/sops-smudge.sh";
     executable = true;
