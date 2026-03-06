@@ -1,11 +1,6 @@
 { config, pkgs, envFilePath, ... }:
 
 let
-  #metodologiaRepo = builtins.fetchGit {
-  #  url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
-  #  ref = "master";
-  #  rev = "f8fe6b59859ebd2e7bdfa2686338bf4a6825b8b0";  # specific commit hash
-  #};
   metodologiaRepo = pkgs.fetchgit {
     url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
     rev = "b3cd611c45d94b744fec553872a9c32b8322c357";
