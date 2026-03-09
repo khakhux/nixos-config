@@ -3,9 +3,9 @@
 let
   metodologiaRepo = pkgs.fetchgit {
     url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
-    rev = "544bf3c19f7053f4f7210521c8af8b5e08c8fdff";
+    rev = "b3f4e9818805c61e0f1f8bed0789498f73d71ada";
     # nix run nixpkgs#nix-prefetch-git -- $url --rev $rev | grep hash
-    sha256 = "sha256-0jJHO6Wz3cZMTIBi5+o86NXZLzAg3pf46N3eCcigWfk=";
+    sha256 = "sha256-u37kcnylxn47xDUTC1ptfAb4++4/ygmXqLXlvxTlCUs=";
   };
 
   envs = import envFilePath;
@@ -46,6 +46,7 @@ in
       http.sslCAInfo = "${config.home.homeDirectory}/.config/nixos-cacerts/ca-bundle.crt";
       core.attributesFile = "${config.home.homeDirectory}/.config/git/.gitattributes";
       include.path = "${config.home.homeDirectory}/.config/git/firma-git-config";
+      core.excludesFile = "${config.home.homeDirectory}/.config/git/.gitignore";
     };
     aliases = {
       # mixed: unstages the changes but keeps them in your working directory
@@ -68,6 +69,7 @@ in
   home.file."/.config/git/firma-git-config".source = "${metodologiaRepo}/git-config/firma-git-config";
   #home.file."/.config/git/.gitattributes".source = ./git-config/.gitattributes;
   home.file."/.config/git/.gitattributes".source = "${metodologiaRepo}/git-config/.gitattributes";
+  home.file."/.config/git/.gitignore".source = "${metodologiaRepo}/git-config/.gitignore";
   home.file."/.config/sops/.sops.yaml".source = "${metodologiaRepo}/sops/.sops.yaml";
   #home.file."/.config/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
   home.file."/.config/sops/sops-clean.sh" = {
