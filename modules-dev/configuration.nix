@@ -77,6 +77,9 @@ EOF
     #soapui
     #zathura / mupdf #pdf viewer
     #flameshot # screenshot tool
+    # for plantuml
+    graphviz
+    jre
   ];
   
   virtualisation.docker = {
