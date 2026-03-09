@@ -3,9 +3,9 @@
 let
   metodologiaRepo = pkgs.fetchgit {
     url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
-    rev = "b3cd611c45d94b744fec553872a9c32b8322c357";
+    rev = "544bf3c19f7053f4f7210521c8af8b5e08c8fdff";
     # nix run nixpkgs#nix-prefetch-git -- $url --rev $rev | grep hash
-    sha256 = "sha256-qyjnIXGeK8uYfSN1A+vdhml/eZ/b2vGI9QdclTOEtvg=";
+    sha256 = "sha256-0jJHO6Wz3cZMTIBi5+o86NXZLzAg3pf46N3eCcigWfk=";
   };
 
   envs = import envFilePath;
