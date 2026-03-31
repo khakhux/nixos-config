@@ -6,10 +6,12 @@
       inherit config pkgs;
       envFilePath = ./user.nix; 
     })
+    (import ../../modules/nvim/neovim.nix { 
+      inherit config pkgs;
+    })
   ];
 
   home.packages = with pkgs; [    
-    neovim
     mc # midnight commander, similar to norton commander
   ];
 }

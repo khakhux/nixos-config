@@ -24,6 +24,18 @@ in
     #python
     #wireshark
     #gh  # GitHub CLI
+    #SoapUI
+    # firmas
+    #asn1js
+    #foxe
+    #xca
+    # dbs
+    #dbeaver
+    #DbVisualizer
+    #HeidiSQL
+    # decompilers
+    #jadx
+    #jd
     opencode
     firefox
     nil          # Nix LSP server for code analysis
@@ -41,6 +53,7 @@ in
     #'')
     gocatcli
     clipse # clipboard manager https://github.com/savedra1/clipse
+    python314
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
