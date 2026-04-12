@@ -73,4 +73,24 @@ sudo nixos-rebuild switch --flake /home/nixos/nixos-config#your-hostname \
 --option substitute false
 https://discourse.nixos.org/t/how-to-install-nixos-with-a-self-signed-cert/55777/2
 
+## Update opencode from unstable
+
+This repository includes a helper script to update only the `nixpkgs-unstable` input and show the opencode version change.
+
+```shell
+./scripts/update-opencode.sh
+```
+
+Apply the updated package immediately on `currolaptop`:
+
+```shell
+./scripts/update-opencode.sh --rebuild
+```
+
+Use a different host name:
+
+```shell
+./scripts/update-opencode.sh --host mininas --rebuild
+```
+
 

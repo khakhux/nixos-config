@@ -3,20 +3,28 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-wsl, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, nixos-wsl, ... }:
     let
       system = "x86_64-linux";
       
       mkHost = hostName: 
         let
           users = import ./hosts/${hostName}/user.nix;
+          pkgsUnstable = import inputs.nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
         in nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = {
+            inherit pkgsUnstable;
+          };
           modules = [
             ./hosts/${hostName}/configuration.nix
             home-manager.nixosModules.home-manager

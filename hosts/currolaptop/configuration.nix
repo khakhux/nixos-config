@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 let
   envs = import ./user.nix;
@@ -36,7 +36,7 @@ in
     # decompilers
     #jadx
     #jd
-    opencode
+    #opencode
     firefox
     nil          # Nix LSP server for code analysis
     nixpkgs-fmt  # Nix Formatter (alternative is alejandra)
@@ -54,6 +54,8 @@ in
     gocatcli
     clipse # clipboard manager https://github.com/savedra1/clipse
     python314
+    pkgsUnstable.opencode
+    ripgrep # para que opencode lea .gitignore
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
