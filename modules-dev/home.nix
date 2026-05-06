@@ -21,12 +21,32 @@ in
     SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
     SOPS_CONFIG = "$HOME/.config/sops/.sops.yaml";
     PATH = "$HOME/.config/sops:$PATH";
+
+    # Stable symlink paths created by the dev-envs/java21 shellHook.
+    # These are picked up by JetBrains Gateway when it launches the WSL2
+    # backend via a login shell, so IntelliJ finds the correct JDK and Maven
+    # without requiring the Nix dev shell to be active.
+    JAVA_HOME = "$HOME/.jdks/java21-pinned";
+    M2_HOME   = "$HOME/.m2/maven-pinned";
+
+    # JVM options file for IntelliJ IDEA (both local and Gateway backend).
+    # IDEA_VM_OPTIONS overrides the IDE's own idea64.vmoptions, so these
+    # settings apply regardless of which IntelliJ version Gateway downloads.
+    IDEA_VM_OPTIONS = "$HOME/.config/idea/idea64.vmoptions";
   };
   programs.bash = {
     enable = true;
     shellAliases = { 
       hello = "echo Hello, ${mainUser}!";
-      idea-java21 = "cd /workspaces/nixos-config/dev-envs/java21 && nix develop --command idea";
+
+      # Run IntelliJ IDEA inside the pinned Nix dev shell (Community edition).
+      # This is the local/fallback mode; prefer JetBrains Gateway for WSL2.
+      idea-java21 = "cd ~/workspaces/nixos-config/dev-envs/java21 && nix develop --command idea";
+
+      # One-time bootstrap: enter the dev shell to create the stable symlinks
+      # (~/.jdks/java21-pinned and ~/.m2/maven-pinned) that JetBrains Gateway
+      # and the JAVA_HOME/M2_HOME session variables rely on.
+      idea-gateway-bootstrap = "cd ~/workspaces/nixos-config/dev-envs/java21 && nix develop --command bash -c 'echo Symlinks created: && ls -la ~/.jdks/java21-pinned ~/.m2/maven-pinned'";
     };
     initExtra = ''
       nrs() {
@@ -68,6 +88,28 @@ in
       cat ${./cacerts/CARaiz.pem} >> $out
     '';
   };
+
+  # JVM options picked up by IntelliJ IDEA via IDEA_VM_OPTIONS (see home.sessionVariables).
+  # Tuned for running as a JetBrains Gateway backend inside WSL2:
+  #   - The UI is rendered by the thin client on Windows, so no GPU/X11 needed in WSL.
+  #   - Generous heap for large Java projects; G1GC balances latency and throughput.
+  #   - File-watcher limit bump avoids "too many open files" on big repos.
+  home.file.".config/idea/idea64.vmoptions".text = ''
+    -Xms512m
+    -Xmx4096m
+    -XX:+UseG1GC
+    -XX:SoftRefLRUPolicyMSPerMB=50
+    -XX:ReservedCodeCacheSize=512m
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:-OmitStackTraceInFastThrow
+    -ea
+    -Dsun.io.useCanonCaches=false
+    -Djava.net.preferIPv4Stack=true
+    -Dsun.java2d.opengl=false
+    -Dsun.java2d.xrender=false
+    -Dawt.useSystemAAFontSettings=lcd
+    -Dide.no.platform.update=true
+  '';
 
   home.file.".m2/settings.xml".source = "${metodologiaRepo}/maven/settings.xml";
   home.file."metodologia/formatter-sgife.xml".source = "${metodologiaRepo}/formatter-sgife.xml";
