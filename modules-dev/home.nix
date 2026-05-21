@@ -119,22 +119,20 @@ in
   home.file."/.config/git/.gitattributes".source = "${metodologiaRepo}/git-config/.gitattributes";
   home.file."/.config/git/.gitignore".source = "${metodologiaRepo}/git-config/.gitignore";
   home.file."/.config/sops/.sops.yaml".source = "${metodologiaRepo}/sops/.sops.yaml";
-  #home.file."/.config/sops/sops-clean.sh".source = ./sops/sops-clean.sh;
   home.file."/.config/sops/sops-clean.sh" = {
-    source = "${metodologiaRepo}/sops/sops-clean.sh";
+    source = ./sops/sops-clean.sh;
     executable = true;
   };
-  #home.file."/.config/sops/sops-smudge.sh".source = ./sops/sops-smudge.sh;
   home.file."/.config/sops/sops-smudge.sh" = {
-    source = "${metodologiaRepo}/sops/sops-smudge.sh";
+    source = ./sops/sops-smudge.sh;
     executable = true;
   };
-    home.file."/.config/sops/test-sops-yaml.sh" = {
-    source = "${metodologiaRepo}/sops/test-sops-yaml.sh";
+  home.file."/.config/sops/test-sops-yaml.sh" = {
+    source = ./sops/test-sops-yaml.sh;
     executable = true;
   };
   home.file."/.config/sops/test-sops-properties.sh" = {
-    source = "${metodologiaRepo}/sops/test-sops-properties.sh";
+    source = ./sops/test-sops-properties.sh;
     executable = true;
   };
 
