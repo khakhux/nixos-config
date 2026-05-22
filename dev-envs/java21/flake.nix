@@ -52,6 +52,7 @@
           # Create stable symlinks for IntelliJ IDEA
           mkdir -p ~/.jdks
           mkdir -p ~/.m2
+          mkdir -p ~/.local/share/jetbrains
           mkdir -p ~/.config/nixos-cacerts
           
           # Link JDK 21.0.3 to a stable path (point to lib/openjdk for IntelliJ)
@@ -59,6 +60,10 @@
           
           # Link Maven 3.8.6 to a stable path
           ln -sfn ${maven386-jdk21} ~/.m2/maven-pinned
+
+          # Link IntelliJ IDEA to a stable path and expose it as IDEA_HOME
+          ln -sfn ${pkgs-unstable.jetbrains.idea} ~/.local/share/jetbrains/idea-pinned
+          export IDEA_HOME="$HOME/.local/share/jetbrains/idea-pinned"
                   
           echo "Java Development Environment"
           echo "=============================="
@@ -68,10 +73,12 @@
           echo ""
           echo "Environment variables:"
           echo "JAVA_HOME: $JAVA_HOME"
+          echo "IDEA_HOME: $IDEA_HOME"
           echo ""
           echo "Stable paths created for IntelliJ IDEA:"
           echo "  JDK:   ~/.jdks/java21-pinned"
           echo "  Maven: ~/.m2/maven-pinned"
+          echo "  IDEA:  ~/.local/share/jetbrains/idea-pinned"
           echo ""
           echo "IntelliJ IDEA — configuration:"
           echo "  File → Project Structure → SDKs → Add JDK"
