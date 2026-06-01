@@ -66,6 +66,7 @@ Use `dev-envs/java21/flake-caraiz.nix` instead when behind the corporate proxy â
 ## Corporate environment notes
 
 - `modules-dev/home.nix` fetches a **private internal GitLab repo** (`metodologia`) at build time using `pkgs.fetchgit` with a pinned SHA. This requires SSH access to `gitlab.central.sepg.minhac.age` during rebuild. Update the `rev` and `sha256` in that file when the repo changes.
+- `docker pull` against `harbor.dockersl.central.sepg.minhac.age` needs Docker daemon trust in addition to the normal system CA bundle. The Harbor certificate chain uses the `Comunica2` intermediate under `CARaiz`, and `modules-dev/configuration.nix` now installs both certificates into `security.pki.certificateFiles` and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the daemon.
 - An **age key** is auto-generated on first home-manager activation (`~/.config/sops/age/keys.txt`). After generation, add the public key to `.sops.yaml` files in other repos that use SOPS encryption.
 - `home-manager.backupFileExtension = "backup"` is set globally â€” conflicting unmanaged files are renamed to `<file>.backup` rather than causing a failure.
 

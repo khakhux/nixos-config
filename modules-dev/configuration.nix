@@ -9,6 +9,11 @@
 
 let
   envs = import envFilePath;
+  corporateRootCa = ./cacerts/CARaiz.pem;
+  corporateIntermediateCa = ./cacerts/Comunica2.crt;
+  harborRegistryCaBundle = pkgs.runCommand "harbor-registry-ca-bundle.crt" {} ''
+    cat ${corporateRootCa} ${corporateIntermediateCa} > "$out"
+  '';
 in
 
 {
@@ -61,8 +66,11 @@ EOF
   '';
 
   security.pki.certificateFiles = [
-    ./cacerts/CARaiz.pem
+    corporateRootCa
+    corporateIntermediateCa
   ];
+
+  environment.etc."docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt".source = harborRegistryCaBundle;
 
   environment.systemPackages = with pkgs; [
     #https://mynixos.com/nixpkgs/package/

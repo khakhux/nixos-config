@@ -69,6 +69,10 @@ sudo nixos-rebuild switch --flake /home/nixos/nixos-config#your-hostname \
   --option ssl-cert-file /etc/ssl/proxy-certs/CARaiz.pem
 ```
 
+For Docker pulls from the private Harbor registry behind the corporate TLS-intercepting proxy, the active `modules-dev/configuration.nix` installs both `modules-dev/cacerts/CARaiz.pem` and `modules-dev/cacerts/Comunica2.crt` into the system trust store, and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the Docker daemon. Harbor currently presents a leaf certificate issued by `Comunica2`, so `CARaiz.pem` alone is not enough.
+
+After `nixos-rebuild switch`, `docker pull harbor.dockersl.central.sepg.minhac.age/...` should complete the TLS handshake successfully. If Docker does not pick it up immediately, restart the daemon with `sudo systemctl restart docker`.
+
 --option substituters http://cache.nixos.org
 --option substitute false
 https://discourse.nixos.org/t/how-to-install-nixos-with-a-self-signed-cert/55777/2
