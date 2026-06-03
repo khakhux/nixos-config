@@ -21,6 +21,7 @@ in
     SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
     SOPS_CONFIG = "$HOME/.config/sops/.sops.yaml";
     PATH = "$HOME/.config/sops:$PATH";
+    COMPOSE_BAKE = "true";  # docker compose build optimizations
 
     # Stable symlink paths created by the dev-envs/java21 shellHook.
     # These are picked up by JetBrains Gateway when it launches the WSL2
