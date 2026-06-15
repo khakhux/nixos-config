@@ -100,6 +100,7 @@
         
         JAVA_HOME = "${jdk21-pinned}";
         M2_HOME = "${maven386-jdk21}";
+        WORKSPACES = "/workspaces/nixos-config/dev-envs/java21/workspaces-java/";
       };
     };
 }
