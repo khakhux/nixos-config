@@ -56,6 +56,7 @@ in
     python314
     pkgsUnstable.opencode
     ripgrep # para que opencode lea .gitignore
+    pkgsUnstable.openspec
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
