@@ -1,0 +1,35 @@
+{
+  "java.jdt.ls.java.home": "/home/your-user/.jdks/java21-pinned",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-21",
+      "path": "/home/your-user/.jdks/java21-pinned",
+      "default": true
+    }
+  ],
+  "java.configuration.maven.userSettings": "/home/your-user/.m2/settings.xml",
+  "maven.settingsFile": "/home/your-user/.m2/settings.xml",
+  "maven.executable.preferMavenWrapper": true,
+  "maven.executable.path": "/home/your-user/.m2/maven-pinned/bin/mvn",
+  "maven.terminal.customEnv": [
+    {
+      "environmentVariable": "JAVA_HOME",
+      "value": "/home/your-user/.jdks/java21-pinned"
+    },
+    {
+      "environmentVariable": "M2_HOME",
+      "value": "/home/your-user/.m2/maven-pinned"
+    }
+  ],
+  "java.server.launchMode": "Standard",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.project.importOnFirstTimeStartup": "automatic",
+  "java.maven.downloadSources": true,
+  "java.import.maven.offline.enabled": false,
+  "java.jdt.ls.lombokSupport.enabled": true,
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java",
+    "editor.formatOnSave": true
+  },
+  "java.format.settings.url": "/home/your-user/metodologia/formatter-sgife.xml"
+}

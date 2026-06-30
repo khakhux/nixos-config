@@ -113,7 +113,12 @@ in
 
   home.file.".m2/settings.xml".source = "${metodologiaRepo}/maven/settings.xml";
   home.file."metodologia/formatter-sgife.xml".source = "${metodologiaRepo}/formatter-sgife.xml";
-
+  home.file.".vscode-server/data/Machine/settings.json".text =
+    builtins.replaceStrings
+      [ "/home/your-user" ]
+      [ config.home.homeDirectory ]
+      (builtins.readFile ./vscode/settings.json);
+      
   home.file."/.config/git/firma-git-config".source = "${metodologiaRepo}/git-config/firma-git-config";
   #home.file."/.config/git/.gitattributes".source = ./git-config/.gitattributes;
   home.file."/.config/git/.gitattributes".source = "${metodologiaRepo}/git-config/.gitattributes";
