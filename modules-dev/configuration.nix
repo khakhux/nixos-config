@@ -10,6 +10,7 @@
 let
   envs = import envFilePath;
   corporateRootCa = ./cacerts/CARaiz.pem;
+  fnmtComponentesCa = ./cacerts/ACCOMP.crt;
   corporateIntermediateCa = ./cacerts/Comunica2.crt;
   harborRegistryCaBundle = pkgs.runCommand "harbor-registry-ca-bundle.crt" {} ''
     cat ${corporateRootCa} ${corporateIntermediateCa} > "$out"
@@ -67,6 +68,7 @@ EOF
 
   security.pki.certificateFiles = [
     corporateRootCa
+    fnmtComponentesCa
     corporateIntermediateCa
   ];
 

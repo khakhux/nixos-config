@@ -86,6 +86,8 @@ in
       cat ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt > $out
       echo "" >> $out
       cat ${./cacerts/CARaiz.pem} >> $out
+      echo "" >> $out
+      cat ${./cacerts/ACCOMP.crt} >> $out
     '';
   };
 

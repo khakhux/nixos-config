@@ -27,7 +27,32 @@
         inherit system; 
         config.allowUnfree = true; 
       };
-      jdk21-pinned = pkgs-jdk2102.jdk21;
+      jdk21-base = pkgs-jdk2102.jdk21;
+      corporateRootCa = ../../modules-dev/cacerts/CARaiz.pem;
+      fnmtIntermediateCa = ../../modules-dev/cacerts/ACCOMP.crt;
+
+      jdk21-pinned = pkgs.runCommand "jdk21-with-custom-ca" {
+        buildInputs = [ jdk21-base ];
+      } ''
+        cp -r ${jdk21-base} $out
+        chmod -R +w $out
+
+        ${jdk21-base}/bin/keytool -importcert -trustcacerts \
+          -alias corporate-ca-raiz \
+          -file ${corporateRootCa} \
+          -keystore $out/lib/openjdk/lib/security/cacerts \
+          -storepass changeit \
+          -noprompt
+
+        ${jdk21-base}/bin/keytool -importcert -trustcacerts \
+          -alias fnmt-ac-componentes-informaticos \
+          -file ${fnmtIntermediateCa} \
+          -keystore $out/lib/openjdk/lib/security/cacerts \
+          -storepass changeit \
+          -noprompt
+
+        chmod -R -w $out
+      '';
       
       # Import Maven 3.8.6 from nixos-22.11 and override to use pinned JDK 21
       pkgs-maven386 = import nixpkgs-maven386 { 

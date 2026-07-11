@@ -21,6 +21,8 @@
         config.allowUnfree = true; 
       };
       jdk21-base = pkgs-jdk2102.jdk21;
+      corporateRootCa = ../../modules-dev/cacerts/CARaiz.pem;
+      fnmtIntermediateCa = ../../modules-dev/cacerts/ACCOMP.crt;
       
       # Create a custom JDK with corporate CA certificate
       jdk21-pinned = pkgs.runCommand "jdk21-with-custom-ca" {
@@ -30,10 +32,19 @@
         cp -r ${jdk21-base} $out
         chmod -R +w $out
         
-        # Import the corporate certificate into cacerts
+        # Import the corporate root certificate and the missing FNMT intermediate.
+        # The target identity provider currently omits the intermediate from the
+        # TLS handshake, so Java must have it locally to build the chain.
         ${jdk21-base}/bin/keytool -importcert -trustcacerts \
           -alias corporate-ca-raiz \
-          -file ${../../modules-dev/cacerts/CARaiz.pem} \
+          -file ${corporateRootCa} \
+          -keystore $out/lib/openjdk/lib/security/cacerts \
+          -storepass changeit \
+          -noprompt
+
+        ${jdk21-base}/bin/keytool -importcert -trustcacerts \
+          -alias fnmt-ac-componentes-informaticos \
+          -file ${fnmtIntermediateCa} \
           -keystore $out/lib/openjdk/lib/security/cacerts \
           -storepass changeit \
           -noprompt
