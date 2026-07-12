@@ -1,0 +1,7 @@
+for d in */; do
+    tar -I zstd -cf "${d%/}.tar.zst" "$d"
+done
+
+tar -I zstd -cf archive.tar.zst archive
+
+tar -I zstd -xf archive.tar.zst
