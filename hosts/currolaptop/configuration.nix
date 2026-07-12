@@ -67,6 +67,7 @@ in
   
   systemd.tmpfiles.rules = [
     "L+ /workspaces - - - - ${config.users.users.${envs.mainUser}.home}/workspaces"
+    "L+ /repos - - - - ${config.users.users.${envs.mainUser}.home}/workspaces/nixos-config/dev-envs/java21/workspaces-java"
   ];
 
   # Clipse clipboard manager listener service
