@@ -9,11 +9,12 @@
 
 let
   envs = import envFilePath;
-  corporateRootCa = ./cacerts/CARaiz.pem;
+  corporateRootCa = ./cacerts/CARaiz.pem;  
+  corporateIntermediateCa1 = ./cacerts/Comunica1.crt;
+  corporateIntermediateCa2 = ./cacerts/Comunica2.crt;
   fnmtComponentesCa = ./cacerts/ACCOMP.crt;
-  corporateIntermediateCa = ./cacerts/Comunica2.crt;
   harborRegistryCaBundle = pkgs.runCommand "harbor-registry-ca-bundle.crt" {} ''
-    cat ${corporateRootCa} ${corporateIntermediateCa} > "$out"
+    cat ${corporateRootCa} ${corporateIntermediateCa1} ${corporateIntermediateCa2} > "$out"
   '';
 in
 
@@ -68,8 +69,9 @@ EOF
 
   security.pki.certificateFiles = [
     corporateRootCa
+    corporateIntermediateCa1
+    corporateIntermediateCa2
     fnmtComponentesCa
-    corporateIntermediateCa
   ];
 
   environment.etc."docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt".source = harborRegistryCaBundle;
