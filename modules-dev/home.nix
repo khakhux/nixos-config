@@ -1,13 +1,14 @@
 { config, pkgs, envFilePath, ... }:
 
 let
-  metodologiaRepo = pkgs.fetchgit {
-    url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
-    rev = "f33553a95ba0e73aab555302489ff3f02ce6c106";
-    
+#metodologiaRepo = pkgs.fetchgit {
+  #  url = "git@gitlab.central.sepg.minhac.age:div_4/administracion-digital/firma-electronica/metodologia/metodologia.git";
+  #  rev = "f33553a95ba0e73aab555302489ff3f02ce6c106";
+
     # nix run nixpkgs#nix-prefetch-git -- $url --rev $rev | grep hash
-    sha256 = "sha256-GhfYtn+wg45SRLV4PoKfmMnLV6bpxhcj3/nxiQjOQvs=";
-  };
+  #  sha256 = "sha256-GhfYtn+wg45SRLV4PoKfmMnLV6bpxhcj3/nxiQjOQvs=";
+  #};
+  metodologiaRepo = ./metodologia;
 
   envs = import envFilePath;
   mainUser = envs.mainUser; 
@@ -89,6 +90,10 @@ in
       cat ${./cacerts/CARaiz.pem} >> $out
       echo "" >> $out
       cat ${./cacerts/ACCOMP.crt} >> $out
+      echo "" >> $out
+      cat ${./cacerts/Comunica1.crt} >> $out
+      echo "" >> $out
+      cat ${./cacerts/Comunica2.crt} >> $out
     '';
   };
 

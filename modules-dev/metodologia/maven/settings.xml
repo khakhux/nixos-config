@@ -1,0 +1,69 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+	<localRepository>${user.home}/.m2/repository</localRepository>
+	<servers>
+		<server>
+			<id>srv-artifactory-librerias</id>
+			<username>${artifactory.username}</username>
+			<password>${artifactory.password}</password>
+		</server>
+		<server>
+			<id>srv-artifactory-compilados</id>
+			<username>${artifactory.username}</username>
+			<password>${artifactory.password}</password>
+		</server>
+	</servers>
+	<!-- Mirror hacia Palma -->
+	<mirrors>
+		<mirror>
+			<id>Mirror-Palma</id>
+			<mirrorOf>*</mirrorOf>
+			<url>http://palma1.central.sepg.minhac.age:8082/artifactory/maven-group/</url>
+			<name>Mirror-Palma</name>
+		</mirror>
+	</mirrors>
+	<profiles>
+		<!-- Perfil activeByDefault para activar SNAPSHOTS en Mirror-Palma -->
+		<profile>
+			<id>palma</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<repositories>
+				<repository>
+					<id>palma</id>
+					<url>http://palma1.central.sepg.minhac.age:8082/artifactory/maven-group/</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
+		</profile>
+		<!-- Perfiles para las librerias/compilados -->
+		<!-- Las librerías internas OIP pueden ser SNAPSHOTS||RELEASES, el repositorio que espera el artefacto en artifactory ${DIVISION} permite que se suban ambos tipos. -->
+		<profile>
+			<id>srv-artifactory-librerias</id>
+			<properties>
+				<altSnapshotDeploymentRepository>srv-artifactory-librerias::http://palma1.central.sepg.minhac.age:8081/artifactory/${DIVISION}</altSnapshotDeploymentRepository>
+				<altReleaseDeploymentRepository>srv-artifactory-librerias::http://palma1.central.sepg.minhac.age:8081/artifactory/${DIVISION}</altReleaseDeploymentRepository>
+				<altDeploymentRepository>srv-artifactory-librerias::default::http://palma1.central.sepg.minhac.age:8081/artifactory/${DIVISION}</altDeploymentRepository>
+			</properties>
+		</profile>
+		<!-- 
+		Los compilados pueden ser SNAPSHOTS||RELEASES, dependiendo qué tipo sea el artefacto, irá a ${DIVISION}-Maven-Snapshots o a ${DIVISION}-Maven-Releases.
+		Estos repositorios que esperan el artefacto están configurados en artifactory para que solo acepten el tipo de paquete que atiendan a su cometido, es decir,
+		no se puede subir un artefacto SNAPSHOT a ${DIVISION}-Maven-Releases o un artefacto RELEASE a ${DIVISION}-Maven-Snapshots.
+		-->
+		<profile>
+			<id>srv-artifactory-compilados</id>
+			<properties>
+				<altSnapshotDeploymentRepository>srv-artifactory-compilados::http://palma1.central.sepg.minhac.age:8081/artifactory/${DIVISION}-Maven-Snapshots</altSnapshotDeploymentRepository>
+				<altReleaseDeploymentRepository>srv-artifactory-compilados::http://palma1.central.sepg.minhac.age:8081/artifactory/${DIVISION}-Maven-Releases</altReleaseDeploymentRepository>
+				<altDeploymentRepository>srv-artifactory-compilados::default::http://palma1.central.sepg.minhac.age:8081/artifactory/${DIVISION}-Maven-Releases</altDeploymentRepository>
+			</properties>
+		</profile>
+	</profiles>
+</settings>

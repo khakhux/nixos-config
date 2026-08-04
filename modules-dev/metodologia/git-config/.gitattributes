@@ -1,0 +1,27 @@
+# SOPS clean/smudge filters for sensitive file types
+
+# Treat all text files as text and convert to LF line endings
+* text=auto eol=lf
+
+# Explicit line ending rules for common files
+*.java     text eol=lf
+Dockerfile text eol=lf
+*.md       text eol=lf
+*.xml      text eol=lf
+*.yml      text eol=lf filter=sops-yaml diff=sops
+*.yaml     text eol=lf filter=sops-yaml diff=sops
+*.properties text eol=lf filter=sops-dotenv diff=sops
+*.sh       text eol=lf
+
+# Ensure scripts are LF to avoid Linux execution issues
+*.bash     text eol=lf
+*.gradle   text eol=lf
+
+# Prevent binary files from being changed
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.pdf      binary
+*.zip      binary
+*.jar      binary
