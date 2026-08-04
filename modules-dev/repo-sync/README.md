@@ -179,3 +179,42 @@ uncommitted changes of its own, it warns and asks before overwriting.
   couldn't push — wire that into whatever shuts the desktop down (a
   systemd unit, a keybinding, etc.) so you don't accidentally reset a
   machine with unpushed work still on it.
+
+# AI Agents development
+
+## Prompt
+
+I work with a few git repos in a gitlab server from my laptop. 
+
+I work using a windows 11 laptop but git repos are stored in a nixos distribution in wsl2. Sometimes I have access to a minipc with nixos where I can host services like forgejo, directly in nixos or in docker.
+
+My work setups are as follows (assuming vpn connection is down):
+- If I'm in workplace 1 with my laptop, I have access to gitlab and my laptop.
+- If I'm in workplace 2 with my laptop, I have access to my minipc and my laptop.
+- If I'm offsite with my laptop, I only have access to my laptop.
+- If I'm in workplace 2 without my laptop, I only have access to my minipc from a fresh desktop. I use a nixos configuration for my .development environment in a git repo where both my laptop and desktop have access, so should be feasible to wotk using this desktop.
+
+Minipc has no access to gitlab or the laptop, but the laptop has access to the minipc when at workplace 2 (but not when at workpace 1).
+
+nixos wsl has no access to usb ports on windows 11 laptop.
+
+I would like to work with a relatively updated copy of these repos in all these cases.
+
+I'm thinking in using a script on the a workflow like this:
+- On workplace 1 
+  - I work normally
+  - At the end of the day I sync gitlab repos to my laptop using `git fetch --all --prune`
+- On workplace 2 (if I have the laptop)
+  - I work normally on the laptop
+  - At the end of the day I rsync repos to the minipc
+- On workplace 2 (if I don't have the laptop)
+  - I rsync repos from the minipc to the desktop
+  - I work normally on the desktop
+  - At the end of the day I rsync repos from the desktop to the minipc
+  - I take a copy of the modified repos with me in a usb to workplace 1
+
+The only caveat is, if working on workplace 1 I go to workplace 2 without my laptop I would not have that days work.
+
+Can you improve the workflow?
+
+Can you create the necessary scripts? Repos path are at /repos (it`s a symlink). I was planning to detect git directories with a find command (rather than using a repos list in a text file) so new repos are detected automatically.
