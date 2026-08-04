@@ -60,13 +60,17 @@ in {
 git add .
 ```
 
+Verificar cert de https://cache.nixos.org/
+
 ```shell
 sudo mkdir -p /etc/ssl/proxy-certs
-sudo cp /home/nixos/nixos-config/modules-dev/cacerts/CARaiz.pem /etc/ssl/proxy-certs/
+cat /etc/ssl/certs/ca-certificates.crt \
+    /home/nixos/nixos-config/modules-dev/cacerts/Comunica1.crt \
+    > /etc/ssl/proxy-certs/ca-bundle-with-corp.pem
 sudo chmod 644 /etc/ssl/proxy-certs/CARaiz.pem
 
 sudo nixos-rebuild switch --flake /home/nixos/nixos-config#your-hostname \
-  --option ssl-cert-file /etc/ssl/proxy-certs/CARaiz.pem
+  --option ssl-cert-file /etc/ssl/proxy-certs/ca-bundle-with-corp.pem
 ```
 
 For Docker pulls from the private Harbor registry behind the corporate TLS-intercepting proxy, the active `modules-dev/configuration.nix` installs both `modules-dev/cacerts/CARaiz.pem` and `modules-dev/cacerts/Comunica2.crt` into the system trust store, and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the Docker daemon. Harbor currently presents a leaf certificate issued by `Comunica2`, so `CARaiz.pem` alone is not enough.
