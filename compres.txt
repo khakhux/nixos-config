@@ -5,3 +5,8 @@ done
 tar -I zstd -cf archive.tar.zst archive
 
 tar -I zstd -xf archive.tar.zst
+
+
+tar --exclude='workspaces-java' -czpf nixos-config.tar.gz nixos-config
+
+tar -xzpf project-backup.tar.gz
