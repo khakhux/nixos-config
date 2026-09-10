@@ -6,7 +6,8 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.05";
+    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   outputs = inputs@{ self, nixpkgs, home-manager, nixos-wsl, ... }:
@@ -24,6 +25,7 @@
           inherit system;
           specialArgs = {
             inherit pkgsUnstable;
+            inherit nixos-wsl;
           };
           modules = [
             ./hosts/${hostName}/configuration.nix
