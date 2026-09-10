@@ -14,4 +14,9 @@
   home.packages = with pkgs; [    
     mc # midnight commander, similar to norton commander
   ];
+
+  # para github spec kit
+  home.sessionPath = [
+    "$HOME/.local/bin"
+  ];
 }

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgsUnstable, ... }:
+{ config, lib, pkgs, pkgsUnstable, nixos-wsl, ... }:
 
 let
   envs = import ./user.nix;
@@ -15,6 +15,10 @@ in
       mainUser = envs.mainUser; 
     })
   ];
+
+  system.build.nativeUtils = lib.mkForce (
+    pkgsUnstable.callPackage "${nixos-wsl}/utils" {}
+  );
 
   environment.systemPackages = with pkgs; [
     #https://mynixos.com/nixpkgs/package/
@@ -57,6 +61,8 @@ in
     pkgsUnstable.opencode
     ripgrep # para que opencode lea .gitignore
     pkgsUnstable.openspec
+    pkgsUnstable.codex
+    uv # para github spec kit, ver aletrnativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
   ];
 
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
