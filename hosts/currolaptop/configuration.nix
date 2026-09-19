@@ -10,6 +10,7 @@ in
       inherit config lib pkgs;
       envFilePath = ./user.nix; 
     })
+    ../../modules/openspec.nix
     (import ../../modules/wsl.nix { 
       inherit config pkgs;
       mainUser = envs.mainUser; 
@@ -60,7 +61,6 @@ in
     python314
     pkgsUnstable.opencode
     ripgrep # para que opencode lea .gitignore
-    pkgsUnstable.openspec
     pkgsUnstable.codex
     uv # para github spec kit, ver aletrnativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
   ];
