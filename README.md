@@ -2,6 +2,8 @@
 
 My nixos configuration files.
 
+For normal input and system updates, see [nix-update.md](nix-update.md).
+
 # Config files layout
 
 ```pgsql
@@ -63,23 +65,39 @@ git add .
 Verificar cert de https://cache.nixos.org/
 
 ```shell
-sudo mkdir -p /etc/ssl/proxy-certs
 cat /etc/ssl/certs/ca-certificates.crt \
+    /home/nixos/nixos-config/modules-dev/cacerts/CARaiz.pem \
     /home/nixos/nixos-config/modules-dev/cacerts/Comunica1.crt \
-    > /etc/ssl/proxy-certs/ca-bundle-with-corp.pem
-sudo chmod 644 /etc/ssl/proxy-certs/CARaiz.pem
+    /home/nixos/nixos-config/modules-dev/cacerts/Comunica2.crt \
+    > /tmp/ca-bundle-with-corp.pem
 
 sudo nixos-rebuild switch --flake /home/nixos/nixos-config#your-hostname \
-  --option ssl-cert-file /etc/ssl/proxy-certs/ca-bundle-with-corp.pem
+  --option ssl-cert-file /tmp/ca-bundle-with-corp.pem
 ```
 
-For Docker pulls from the private Harbor registry behind the corporate TLS-intercepting proxy, the active `modules-dev/configuration.nix` installs both `modules-dev/cacerts/CARaiz.pem` and `modules-dev/cacerts/Comunica2.crt` into the system trust store, and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the Docker daemon. Harbor currently presents a leaf certificate issued by `Comunica2`, so `CARaiz.pem` alone is not enough.
+For Docker pulls from the private Harbor registry behind the corporate TLS-intercepting proxy, the active `modules-dev/configuration.nix` installs `modules-dev/cacerts/CARaiz.pem`, `modules-dev/cacerts/Comunica1.crt`, `modules-dev/cacerts/Comunica2.crt`, and `modules-dev/cacerts/ACCOMP.crt` into the system trust store, and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the Docker daemon. Harbor currently presents a leaf certificate issued by `Comunica2`, so `CARaiz.pem` alone is not enough.
 
 After `nixos-rebuild switch`, `docker pull harbor.dockersl.central.sepg.minhac.age/...` should complete the TLS handshake successfully. If Docker does not pick it up immediately, restart the daemon with `sudo systemctl restart docker`.
 
 --option substituters http://cache.nixos.org
 --option substitute false
 https://discourse.nixos.org/t/how-to-install-nixos-with-a-self-signed-cert/55777/2
+
+## Update flake inputs and system
+
+The recommended update flow is documented in [nix-update.md](nix-update.md). The short version is:
+
+```shell
+nix flake update
+sudo nixos-rebuild test --flake .
+sudo nixos-rebuild switch --flake .
+```
+
+If you only want to move the unstable toolchain used by `opencode`, `openspec`, and `codex` on `currolaptop`, update just `nixpkgs-unstable`:
+
+```shell
+nix flake lock --update-input nixpkgs-unstable
+```
 
 ## Update opencode from unstable
 

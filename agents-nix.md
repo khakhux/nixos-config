@@ -420,3 +420,9 @@ Wrote file successfully.
 
 ---
 
+## Current repo snapshot after the last four commits
+
+- `nix-update.md` is now the preferred write-up for the normal `nix flake update` -> `nixos-rebuild test` -> `switch` flow.
+- `currolaptop` now installs `pkgsUnstable.opencode`, `pkgsUnstable.openspec`, `pkgsUnstable.codex`, and `uv`, and its home config adds `~/.local/bin` to `PATH` for Spec Kit helpers.
+- `nixos-wsl` moved to `release-25.05` and now follows `nixpkgs-unstable`.
+

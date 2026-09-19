@@ -1,6 +1,6 @@
 # AGENTS.md — NixOS Config
 
-Personal NixOS flake for a single active host (`currolaptop`, WSL2 on Windows). The `modules/` tree is mostly library/template code; the live configuration lives in `modules-dev/` and `hosts/currolaptop/`.
+Personal NixOS flake for a single active host (`currolaptop`, WSL2 on Windows). The `modules/` tree is mostly library/template code; the live configuration lives in `modules-dev/` and `hosts/currolaptop/`. For routine updates, follow [nix-update.md](nix-update.md).
 
 ## Apply the config
 
@@ -26,7 +26,7 @@ There is no CI, no Makefile, no linter, and no test suite. The only verification
 ./scripts/update-opencode.sh --rebuild  # also rebuilds currolaptop immediately
 ```
 
-`opencode` is installed from `pkgsUnstable`, not stable nixpkgs. This script updates only the `nixpkgs-unstable` lock entry.
+`opencode`, `openspec`, and `codex` are installed from `pkgsUnstable`, not stable nixpkgs. This script updates only the `nixpkgs-unstable` lock entry.
 
 ## Dev shell (Java/Maven/IntelliJ)
 
@@ -37,6 +37,8 @@ idea-java21
 ```
 
 Use `dev-envs/java21/flake-caraiz.nix` instead when behind the corporate proxy — it bakes `CARaiz.pem` into the JDK cacerts keystore.
+
+`currolaptop` also adds `uv` and puts `~/.local/bin` on `PATH` so GitHub Spec Kit helpers are reachable.
 
 ## Key architecture facts
 
@@ -77,4 +79,4 @@ Use `dev-envs/java21/flake-caraiz.nix` instead when behind the corporate proxy �
 | `nixpkgs` | `nixos-25.05` | Everything (stable) |
 | `nixpkgs-unstable` | rolling | `opencode` and select packages via `pkgsUnstable` |
 | `home-manager` | `release-25.05` | Follows stable nixpkgs |
-| `nixos-wsl` | `main` | WSL2 integration |
+| `nixos-wsl` | `release-25.05` | WSL2 integration; now follows `nixpkgs-unstable` |
