@@ -8,6 +8,9 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.05";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    nanocoder = {
+      url = "github:Nano-Collective/nanocoder";
+    };  
   };
 
   outputs = inputs@{ self, nixpkgs, home-manager, nixos-wsl, ... }:
@@ -24,6 +27,7 @@
         in nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
+            inherit inputs;
             inherit pkgsUnstable;
             inherit nixos-wsl;
           };

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgsUnstable, nixos-wsl, ... }:
+{ config, lib, pkgs, pkgsUnstable, nixos-wsl, inputs, ... }:
 
 let
   envs = import ./user.nix;
@@ -63,8 +63,8 @@ in
     ripgrep # para que opencode lea .gitignore
     pkgsUnstable.codex
     uv # para github spec kit, ver aletrnativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
+    inputs.nanocoder.packages."${system}".default
   ];
-
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
   #fileSystems."/usr/lib/jvm/default-jdk" = {
   #  device = "${pkgs.jdk}/lib/openjdk";
