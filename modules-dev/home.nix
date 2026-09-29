@@ -70,12 +70,7 @@ in
       include.path = "${config.home.homeDirectory}/.config/git/firma-git-config";
       core.excludesFile = "${config.home.homeDirectory}/.config/git/.gitignore";
     };
-    aliases = {
-      # mixed: unstages the changes but keeps them in your working directory
-      # other options: soft, hard
-      undoco = "reset HEAD~1 --mixed"; # undo last commit but keep changes staged
-      editco = "git commit --amend"; # edit the last commit message
-    };
+    aliases = import ./git-aliases.nix;
   };
 
   programs.direnv = {
