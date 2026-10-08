@@ -49,6 +49,8 @@ in
       # (~/.jdks/java21-pinned and ~/.m2/maven-pinned) that JetBrains Gateway
       # and the JAVA_HOME/M2_HOME session variables rely on.
       idea-gateway-bootstrap = "cd ~/workspaces/nixos-config/dev-envs/java21 && nix develop --command bash -c 'echo Symlinks created: && ls -la ~/.jdks/java21-pinned ~/.m2/maven-pinned'";
+
+      convert-lf = "find src -type f -name '*.java' -exec sed -i 's/\r$//' {} +";
     };
     initExtra = ''
       nrs() {

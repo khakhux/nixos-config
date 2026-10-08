@@ -31,5 +31,6 @@
     "editor.defaultFormatter": "redhat.java",
     "editor.formatOnSave": true
   },
-  "java.format.settings.url": "/home/your-user/metodologia/formatter-sgife.xml"
+  "java.format.settings.url": "/home/your-user/metodologia/formatter-sgife.xml",
+  "files.eol": "\n"
 }
