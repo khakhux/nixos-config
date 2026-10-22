@@ -13,6 +13,7 @@ let
   corporateIntermediateCa1 = ./cacerts/Comunica1.crt;
   corporateIntermediateCa2 = ./cacerts/Comunica2.crt;
   fnmtComponentesCa = ./cacerts/ACCOMP.crt;
+  fnmtRaizCa = ./cacerts/AC-RAIZ-FNMT-RCM-SERVIDORES-SEGUROS-G2R.crt;
   harborRegistryCaBundle = pkgs.runCommand "harbor-registry-ca-bundle.crt" {} ''
     cat ${corporateRootCa} ${corporateIntermediateCa1} ${corporateIntermediateCa2} > "$out"
   '';
@@ -72,6 +73,7 @@ EOF
     corporateIntermediateCa1
     corporateIntermediateCa2
     fnmtComponentesCa
+    fnmtRaizCa
   ];
 
   environment.etc."docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt".source = harborRegistryCaBundle;

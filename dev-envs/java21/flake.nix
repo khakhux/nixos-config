@@ -30,6 +30,7 @@
       jdk21-base = pkgs-jdk2102.jdk21;
       corporateRootCa = ../../modules-dev/cacerts/CARaiz.pem;
       fnmtIntermediateCa = ../../modules-dev/cacerts/ACCOMP.crt;
+      fnmtRaizCa = ../../modules-dev/cacerts/AC-RAIZ-FNMT-RCM-SERVIDORES-SEGUROS-G2R.crt;
 
       jdk21-pinned = pkgs.runCommand "jdk21-with-custom-ca" {
         buildInputs = [ jdk21-base ];
@@ -47,6 +48,13 @@
         ${jdk21-base}/bin/keytool -importcert -trustcacerts \
           -alias fnmt-ac-componentes-informaticos \
           -file ${fnmtIntermediateCa} \
+          -keystore $out/lib/openjdk/lib/security/cacerts \
+          -storepass changeit \
+          -noprompt
+
+        ${jdk21-base}/bin/keytool -importcert -trustcacerts \
+          -alias fnmt-raiz \
+          -file ${fnmtRaizCa} \
           -keystore $out/lib/openjdk/lib/security/cacerts \
           -storepass changeit \
           -noprompt

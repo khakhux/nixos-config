@@ -21,6 +21,8 @@ in
     pkgsUnstable.callPackage "${nixos-wsl}/utils" {}
   );
 
+  environment.sessionVariables.REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-bundle.crt";
+
   environment.systemPackages = with pkgs; [
     #https://mynixos.com/nixpkgs/package/
     vscode

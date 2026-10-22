@@ -88,6 +88,8 @@ in
       echo "" >> $out
       cat ${./cacerts/ACCOMP.crt} >> $out
       echo "" >> $out
+      cat ${./cacerts/AC-RAIZ-FNMT-RCM-SERVIDORES-SEGUROS-G2R.crt} >> $out
+      echo "" >> $out
       cat ${./cacerts/Comunica1.crt} >> $out
       echo "" >> $out
       cat ${./cacerts/Comunica2.crt} >> $out
