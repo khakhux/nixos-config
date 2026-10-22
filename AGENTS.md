@@ -36,8 +36,6 @@ cd dev-envs/java21 && nix develop          # standard (no corp CA)
 idea-java21
 ```
 
-Use `dev-envs/java21/flake-caraiz.nix` instead when behind the corporate proxy — it bakes `CARaiz.pem` into the JDK cacerts keystore.
-
 `currolaptop` also adds `uv` and puts `~/.local/bin` on `PATH` so GitHub Spec Kit helpers are reachable.
 
 ## Key architecture facts
