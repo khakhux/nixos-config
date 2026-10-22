@@ -157,7 +157,6 @@ nixos-config/
 └── dev-envs/
     └── java21/
         ├── flake.nix           # Dev shell: pinned JDK 21.0.2 + Maven 3.8.6 + IntelliJ
-        └── flake-caraiz.nix    # Same but with corporate CA baked into the JDK cacerts
 ```
 
 ---
@@ -304,7 +303,7 @@ hosts/currolaptop/home.nix
 6. **Corporate CA cert (`CARaiz.pem`)** is embedded in the repo at `modules-dev/cacerts/`. It is:
    - Added to the system PKI store via `security.pki.certificateFiles` in `modules-dev/configuration.nix`.
    - Merged into a custom ca-bundle in home-manager and configured as `http.sslCAInfo` for git.
-   - Baked into the JDK cacerts keystore via `flake-caraiz.nix` for Java Maven builds.
+   - Baked into the JDK cacerts keystore via `flake.nix` for Java Maven builds.
    - Used during initial `nixos-rebuild switch` via `--option ssl-cert-file`.
 
 7. **Private GitLab repo is fetched at build time.** `modules-dev/home.nix` uses `pkgs.fetchgit` with a pinned SHA to fetch a private internal repository (`metodologia`) from `gitlab.central.sepg.minhac.age`. This requires SSH access to that GitLab at build time. The fetched content deploys Maven settings, git config, git attributes, SOPS scripts, and a Maven formatter config.
@@ -331,9 +330,7 @@ hosts/currolaptop/home.nix
 
 ## Dev Environment: `dev-envs/java21/`
 
-Two variants exist:
-- **`flake.nix`**: Standard — JDK 21.0.2 (pinned from nixos-24.05), Maven 3.8.6 (pinned from nixos-22.11, overridden to use pinned JDK), IntelliJ from unstable. JDK and Maven are symlinked to stable paths (`~/.jdks/java21-pinned`, `~/.m2/maven-pinned`) so IntelliJ config doesn't break across rebuilds.
-- **`flake-caraiz.nix`**: Corporate variant — same tools, but JDK is post-processed with `pkgs.runCommand` to `keytool -importcert` the corporate CA (`CARaiz.pem`) into the JDK's own `cacerts` keystore. Uses `idea-ultimate` (licensed) instead of community. This is the version to use at work.
+- **`flake.nix`**: Standard — JDK 21.0.2 (pinned from nixos-24.05), Maven 3.8.6 (pinned from nixos-22.11, overridden to use pinned JDK), IntelliJ from unstable. JDK and Maven are symlinked to stable paths (`~/.jdks/java21-pinned`, `~/.m2/maven-pinned`) so IntelliJ config doesn't break across rebuilds. JDK is post-processed with `pkgs.runCommand` to `keytool -importcert` the corporate CA (`CARaiz.pem`) into the JDK's own `cacerts` keystore.
 
 The dev shells use multiple pinned nixpkgs channels simultaneously (22.11, 24.05, 25.05, unstable) to get exactly the right package versions, demonstrating Nix's ability to pin individual packages to different channel snapshots.
 
@@ -412,7 +409,6 @@ Wrote file successfully.
 
 - **Apply the config** — the `nrs` alias and the `--option ssl-cert-file` proxy flag are non-obvious; an agent would likely guess the wrong rebuild command.
 - **Update opencode** — the script is the only automation; documenting that `opencode` comes from `pkgsUnstable` (not stable) prevents incorrect update attempts.
-- **Dev shell** — two flake variants exist (`flake.nix` vs `flake-caraiz.nix`); using the wrong one breaks Maven SSL in the corporate environment.
 - **Key architecture facts** — the phantom hosts (`server-docker-01`, `mininas`) would cause hard-to-diagnose evaluation failures; the unconditional WSL module load is a gotcha for any new host; `user.nix`-as-data-not-module is a pattern an agent would likely misread.
 - **Directory map** — clarifies which `modules/` files are unused templates vs. which are actually wired to the live host.
 - **Corporate environment notes** — the private GitLab fetch at build time is invisible from filenames alone; the age key bootstrapping step has external side effects in other repos.
