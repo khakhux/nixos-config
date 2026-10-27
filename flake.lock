@@ -100,11 +100,11 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1790606114,
-        "narHash": "sha256-4dmSzv3YgLAVQvLbbXHQMh8uCpwKZ/WVUQP1PLlxb3s=",
+        "lastModified": 1793070218,
+        "narHash": "sha256-emyrxxNge0VLxcsnGawhR3RnUsdqRmEGbeoViBITMsY=",
         "owner": "Nano-Collective",
         "repo": "nanocoder",
-        "rev": "258a916ee5bff51564635100a71625b63fb99673",
+        "rev": "f5d82179f5032dc4990916e22a72d02f0feb2343",
         "type": "github"
       },
       "original": {
@@ -153,11 +153,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1788982683,
-        "narHash": "sha256-PJCTsE4I20CrJJPcye9/z6brRFysG5+aygr/dZK097k=",
+        "lastModified": 1792842277,
+        "narHash": "sha256-pGPnZGi8y9d76xNeracniXO3dsYVROEmMkMc8jD0Ihc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5052d7ccbcfb7e4ae1586cb2ecf95a2e3707dce9",
+        "rev": "d3b13ad75cc492690728f9307e443dec9ef9a20e",
         "type": "github"
       },
       "original": {
