@@ -38,6 +38,10 @@
         cp -r ${jdk21-base} $out
         chmod -R +w $out
 
+        while IFS= read -r -d "" nativeLibrary; do
+          ln -sfn "${jdk21-base}/''${nativeLibrary#"$out/"}" "$nativeLibrary"
+        done < <(find "$out/lib/openjdk" -type f -name '*.so' -print0)
+
         ${jdk21-base}/bin/keytool -importcert -trustcacerts \
           -alias corporate-ca-raiz \
           -file ${corporateRootCa} \
