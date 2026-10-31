@@ -1,8 +1,12 @@
-{ config, pkgs, mainUser, ... }:
+{ config, pkgs, ... }:
+
+let
+  users = import ../users.nix;
+in
 
 {
-  home.username = mainUser;
-  home.homeDirectory = "/home/${mainUser}";
+  home.username = users.mainUser;
+  home.homeDirectory = "/home/${users.mainUser}";
   home.stateVersion = "25.05";
   programs.bash = {
     enable = true;
