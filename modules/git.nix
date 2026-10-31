@@ -13,6 +13,6 @@ in
       pull.rebase = false;
       init.defaultBranch = "main";
     };
-    aliases = import ./git-aliases.nix;
+    aliases = import ../modules-dev/git-aliases.nix;
   };
 }
