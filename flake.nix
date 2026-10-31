@@ -6,11 +6,13 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.05";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, nixos-wsl, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, nix-index-database, nixos-wsl, ... }:
     let
       system = "x86_64-linux";
       
@@ -30,6 +32,7 @@
           };
           modules = [
             ./hosts/${hostName}/configuration.nix
+            nix-index-database.nixosModules.default
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
@@ -45,6 +48,7 @@
         server-docker-01 = mkHost "server-docker-01";
         mininas = mkHost "mininas";
         currolaptop = mkHost "currolaptop";
+        minipc-n150 = mkHost "minipc-n150";
         # Add more hosts like this:
         # other-host = mkHost "other-host";
       };
