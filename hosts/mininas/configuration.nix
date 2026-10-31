@@ -50,6 +50,8 @@ in
       ports.PINCHFLAT
       ports.GPODDER
       #ports.RADICALE
+      ports.SYNCERY
+      ports.DOCKHAND
     ];
     firewall.allowedUDPPorts = [ 
       ports.TRANSMISSION 
