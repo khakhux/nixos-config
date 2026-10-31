@@ -43,7 +43,6 @@ in
     # decompilers
     #jadx
     #jd
-    #opencode
     firefox
     nil          # Nix LSP server for code analysis
     nixpkgs-fmt  # Nix Formatter (alternative is alejandra)
@@ -64,7 +63,7 @@ in
     pkgsUnstable.opencode
     ripgrep # para que opencode lea .gitignore
     pkgsUnstable.codex
-    uv # para github spec kit, ver aletrnativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
+    uv # para github spec kit, ver alternativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
   ];
   #system.activationScripts.make-jdk-dir = "mkdir -p /usr/lib/jvm/default-jdk";
   #fileSystems."/usr/lib/jvm/default-jdk" = {
