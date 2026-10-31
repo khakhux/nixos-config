@@ -149,6 +149,9 @@ in
     #pkgsUnstable.calibre
     pkgsUnstable.esphome
     libusb1
+    pkgsUnstable.opencode
+    ripgrep # para que opencode lea .gitignore
+    #uv # para github spec kit, ver alternativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
 ];
 
 programs.nix-ld.enable = true;
