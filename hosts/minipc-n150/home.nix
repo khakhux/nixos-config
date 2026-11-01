@@ -11,5 +11,6 @@
 
   home.packages = with pkgs; [    
     mc # midnight commander, similar to norton commander
+    gnome-commander
   ];
 }
