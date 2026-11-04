@@ -60,7 +60,13 @@ in
     gocatcli
     clipse # clipboard manager https://github.com/savedra1/clipse
     python314
-    pkgsUnstable.opencode
+    (if pkgsUnstable.opencode.version == "2.2.5" then
+      pkgsUnstable.opencode.overrideAttrs (_: previousAttrs: {
+        node_modules = previousAttrs.node_modules.overrideAttrs {
+          outputHash = "sha256-prx9dX7kUvs/E3zopkaPk5LXh3xJAy5sZeum/W8L7cA=";
+        };
+      })
+    else pkgsUnstable.opencode)
     ripgrep # para que opencode lea .gitignore
     pkgsUnstable.codex
     uv # para github spec kit, ver alternativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
