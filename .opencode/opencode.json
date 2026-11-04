@@ -4,7 +4,8 @@
     "servers": {
       "nixos": {
         "type": "local",
-        "command": ["uvx", "mcp-nixos"]
+        "command": ["uvx", "mcp-nixos"],
+        "disabled": true
       }
     }
   }
