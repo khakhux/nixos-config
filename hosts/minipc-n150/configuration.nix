@@ -152,6 +152,7 @@ in
     pkgsUnstable.opencode
     ripgrep # para que opencode lea .gitignore
     uv # para github spec kit, ver alternativa https://nixos.freundcloud.com/tooling/Github-spec-kit/
+    python3
 ];
 
 programs.nix-ld.enable = true;
