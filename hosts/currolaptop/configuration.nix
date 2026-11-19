@@ -24,6 +24,7 @@ in
   environment.sessionVariables.REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-bundle.crt";
 
   environment.systemPackages = with pkgs; [
+    (import scripts/keepass-sync.nix { inherit pkgs; })
     #https://mynixos.com/nixpkgs/package/
     vscode
     jetbrains.idea-ultimate #/ jetbrains.idea-community
