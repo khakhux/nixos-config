@@ -114,6 +114,17 @@ EOF
     options = "--delete-older-than 30d";
   };
 
+  age.secrets.github-token = {
+    file = ../secrets/github-token.age;
+    owner = envs.mainUser;
+    mode = "0400";
+  };
+
+  # github access token to be used in nix flake update, file content is: access-tokens = github.com=TOKEN
+  nix.extraOptions = ''
+    !include ${config.age.secrets.github-token.path}
+  '';
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   system.stateVersion = "25.05"; # Did you read the comment?

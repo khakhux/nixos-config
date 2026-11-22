@@ -23,6 +23,12 @@ in
 
   environment.sessionVariables.REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-bundle.crt";
 
+  # for using age ssh keys
+  services.openssh.enable = true;
+
+  # WSL has no host SSH keys; use the key that matches the agenix recipient.
+  age.identityPaths = lib.mkForce [ "/home/cacu/.ssh/id_github" ];
+
   environment.systemPackages = with pkgs; [
     (import scripts/keepass-sync.nix { inherit pkgs; })
     #https://mynixos.com/nixpkgs/package/
