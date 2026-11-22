@@ -60,7 +60,7 @@ idea-java21
 | `modules/nvim/` | Neovim home-manager module; imported by `currolaptop/home.nix` |
 | `modules/wsl.nix` | WSL2 shim; imported by `currolaptop/configuration.nix` |
 | `modules/docker.nix` | Docker; imported by `modules-dev/configuration.nix` |
-| `dev-envs/java21/` | Dev shell: pinned JDK 21 + Maven 3.8.6 + IntelliJ |
+| `dev-envs/java21/` | Dev shell: JDK 21.0.13 + Maven 3.9.8 + IntelliJ |
 | `scripts/update-opencode.sh` | Only automation script |
 
 ## Corporate environment notes

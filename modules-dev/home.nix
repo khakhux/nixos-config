@@ -66,7 +66,6 @@ in
     userEmail = envs.gitEmail;
     extraConfig = {
       pull.rebase = false;
-      init.defaultBranch = "main";
       http.sslCAInfo = "${config.home.homeDirectory}/.config/nixos-cacerts/ca-bundle.crt";
       core.attributesFile = "${config.home.homeDirectory}/.config/git/.gitattributes";
       include.path = "${config.home.homeDirectory}/.config/git/firma-git-config";
