@@ -16,6 +16,8 @@ in
     (import ../../modules/home/programs/ssh/desktop.nix { inherit users; })
   ];
 
+  home.file.".ssh/known_hosts".source = ./known_hosts;
+
   home.packages = with pkgs; [    
     mc # midnight commander, similar to norton commander
   ];

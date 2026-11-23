@@ -8,4 +8,5 @@
       identitiesOnly = true;
     };
   };
+  home.file.".ssh/known_hosts".source = ./known_hosts;
 }

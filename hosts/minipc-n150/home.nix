@@ -13,6 +13,8 @@ in
     #})
   ];
 
+  home.file.".ssh/known_hosts".source = ./known_hosts;
+  
   home.packages = with pkgs; [    
     mc # midnight commander, similar to norton commander
     gnome-commander
