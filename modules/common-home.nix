@@ -5,6 +5,10 @@ let
 in
 
 {
+  imports = [
+    ./home/programs/ssh/common.nix
+  ];
+
   home.username = users.mainUser;
   home.homeDirectory = "/home/${users.mainUser}";
   home.stateVersion = "25.05";

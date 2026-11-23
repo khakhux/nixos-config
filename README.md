@@ -1,122 +1,127 @@
-# Description
+# NixOS configuration
 
-My nixos configuration files.
+Personal NixOS flake. The only configured host is `currolaptop`, running NixOS-WSL on Windows. The repository also contains reusable modules and templates, but the live host configuration is in `hosts/currolaptop/` and `modules-dev/`.
 
-For normal input and system updates, see [nix-update.md](nix-update.md).
+For routine Nix input and system updates, see [nix-update.md](nix-update.md). Agent-facing architecture and maintenance notes are in [AGENTS.md](AGENTS.md).
 
-# Config files layout
+## Repository layout
 
-```pgsql
-nixos/
+```text
+.
 ├── flake.nix
+├── hosts/
+│   └── currolaptop/
+│       ├── configuration.nix
+│       ├── home.nix
+│       └── user.nix             # mainUser, hostname, gitUser, gitEmail
 ├── modules-dev/
-    └── cacerts/CARaiz.pem
-    └── configuration.nix (common config for system)
-    └── home.nix (common config for user)
+│   ├── configuration.nix       # active system settings
+│   ├── home.nix                 # shared Home Manager settings
+│   ├── home/programs/ssh/work.nix
+│   └── cacerts/
 ├── modules/
-    └── common-configuration.nix
-    └── common-home.nix
-    └── hardened-ssh.nix
-    └── ...
-└── hosts/
-    └── currolaptop/
-        ├── configuration.nix
-        └── home.nix
-        └── user.nix (user config for host and git)
+│   ├── home/programs/ssh/       # common and desktop SSH blocks
+│   ├── nvim/
+│   ├── docker.nix
+│   └── wsl.nix
+├── dev-envs/java21/
+└── scripts/update-opencode.sh
 ```
 
-# Installation
+`hosts/currolaptop/user.nix` is a plain Nix attrset, not a NixOS module. The host's `home.nix` imports it for host-specific settings and passes its path to `modules-dev/home.nix` as `envFilePath`. The shared home module imports it for common user configuration and imports the work SSH module.
 
-After booting nixos using iso or [adding in wsl2](https://nix-community.github.io/NixOS-WSL/install.html)
+## SSH configuration
 
-## Clone repo and create machine specific files
+### Rationale
 
-Clone repo
+SSH configuration is split by scope:
 
-```shell
-hostname <hostname>
+- `modules/home/programs/ssh/common.nix` defines common hosts.
+- `modules/home/programs/ssh/desktop.nix` defines home-network hosts.
+- `modules-dev/home/programs/ssh/work.nix` defines the work GitLab host and gets its login from `gitUser` in `hosts/currolaptop/user.nix`.
 
-cd repo/hosts
-mkdir $HOSTNAME
-cp /etc/nixos/hardware-configuration.nix $HOSTNAME
-cp templates/host/*.nix $HOSTNAME
+Home Manager uses `programs.ssh.matchBlocks` for these host definitions. Use lowercase option names such as `hostname`, `user`, `identityFile`, and `identitiesOnly`; `programs.ssh.settings` is not an option in the pinned Home Manager release.
+
+### Files structure
+
+```text
+modules/
+└── home/
+    ├── common-home.nix (imports common.nix)
+    └── programs/
+        └── ssh/
+            ├── common.nix (ssh common config and github) (we could move ssh settings to ssh-settings.nix)
+            └── desktop.nix (mininas, raspberry)
+modules-dev/
+└── home/
+    ├── home.nix (imports work.nix)
+    └── programs/
+        └── ssh/
+            └── work.nix (gitlab)
+hosts/
+└── currolaptop 
+    └── home.nix (imports common.nix, desktop.nix) (imports work.nix through modules-dev/home.nix)
+└── minipc-n150
+    └── home.nix (imports desktop.nix) (imports common.nix through modules/common-home.nix)
+└── mininas, raspberry
+    └── home.nix (import common.nix through modules/common-home.nix)
 ```
 
-- configure user.nix
-- add programs to configuration.nix or home.nix
+## Apply the configuration
 
-add host to flake.nix
-```shell
-{
-  ...
-in {
-      nixosConfigurations = {
-        server-docker-01 = mkHost "server-docker-01";
-        new-server = mkHost "new-server";
-      };
-    };
-}
+On `currolaptop`, the `nrs` shell alias runs:
+
+```sh
+sudo nixos-rebuild switch --flake ~/workspaces/nixos-config#$(hostname)
 ```
 
-```shell
-git add .
+Equivalent explicit command:
+
+```sh
+sudo nixos-rebuild switch --flake /path/to/nixos-config#currolaptop
 ```
 
-Verificar cert de https://cache.nixos.org/
+For a first rebuild behind the corporate proxy, the configured corporate CA may need to be supplied explicitly:
 
-```shell
-cat /etc/ssl/certs/ca-certificates.crt \
-    /home/nixos/nixos-config/modules-dev/cacerts/CARaiz.pem \
-    /home/nixos/nixos-config/modules-dev/cacerts/Comunica1.crt \
-    /home/nixos/nixos-config/modules-dev/cacerts/Comunica2.crt \
-    > /tmp/ca-bundle-with-corp.pem
-
-sudo nixos-rebuild switch --flake /home/nixos/nixos-config#your-hostname \
-  --option ssl-cert-file /tmp/ca-bundle-with-corp.pem
+```sh
+sudo nixos-rebuild switch --flake /path/to/nixos-config#currolaptop \
+  --option ssl-cert-file /etc/ssl/proxy-certs/CARaiz.pem
 ```
 
-For Docker pulls from the private Harbor registry behind the corporate TLS-intercepting proxy, the active `modules-dev/configuration.nix` installs `modules-dev/cacerts/CARaiz.pem`, `modules-dev/cacerts/Comunica1.crt`, `modules-dev/cacerts/Comunica2.crt`, and `modules-dev/cacerts/ACCOMP.crt` into the system trust store, and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the Docker daemon. Harbor currently presents a leaf certificate issued by `Comunica2`, so `CARaiz.pem` alone is not enough.
+The flake currently declares `server-docker-01`, `mininas`, and `minipc-n150` as well, but their `hosts/` directories are absent. Only `currolaptop` has a complete host configuration. The host factory also loads the NixOS-WSL module unconditionally, so supporting a non-WSL host requires adjusting that factory.
 
-After `nixos-rebuild switch`, `docker pull harbor.dockersl.central.sepg.minhac.age/...` should complete the TLS handshake successfully. If Docker does not pick it up immediately, restart the daemon with `sudo systemctl restart docker`.
+There is no CI or test suite. For lightweight validation of Nix edits, parse changed files with `nix-instantiate --parse` and evaluate relevant configuration attributes with `nix eval`. The full system validation is a successful `nixos-rebuild switch`.
 
---option substituters http://cache.nixos.org
---option substitute false
-https://discourse.nixos.org/t/how-to-install-nixos-with-a-self-signed-cert/55777/2
+## Corporate Docker registry
 
-## Update flake inputs and system
+Pulls from `harbor.dockersl.central.sepg.minhac.age` need the corporate certificate chain trusted by Docker itself, in addition to the system trust store. `modules-dev/configuration.nix` installs the required certificates and writes a combined bundle to:
 
-The recommended update flow is documented in [nix-update.md](nix-update.md). The short version is:
-
-```shell
-nix flake update
-sudo nixos-rebuild test --flake .
-sudo nixos-rebuild switch --flake .
+```text
+/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt
 ```
 
-If you only want to move the unstable toolchain used by `opencode`, `openspec`, and `codex` on `currolaptop`, update just `nixpkgs-unstable`:
+If Docker does not pick up a trust-store change immediately, restart it with `sudo systemctl restart docker`.
 
-```shell
-nix flake lock --update-input nixpkgs-unstable
+## Java development shell
+
+The Java 21, Maven, and IntelliJ environment is in `dev-envs/java21/`:
+
+```sh
+cd dev-envs/java21 && nix develop
+# or, from the configured home environment:
+idea-java21
 ```
 
-## Update opencode from unstable
+`currolaptop` also adds `uv` and `~/.local/bin` to the environment for GitHub Spec Kit helpers.
 
-This repository includes a helper script to update only the `nixpkgs-unstable` input and show the opencode version change.
+## Update OpenCode
 
-```shell
+`opencode`, `openspec`, and `codex` are installed from `nixpkgs-unstable`. The helper updates only that flake input:
+
+```sh
 ./scripts/update-opencode.sh
-```
-
-Apply the updated package immediately on `currolaptop`:
-
-```shell
 ./scripts/update-opencode.sh --rebuild
 ```
 
-Use a different host name:
-
-```shell
-./scripts/update-opencode.sh --host mininas --rebuild
-```
-
+# Future Enhancements
 
