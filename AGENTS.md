@@ -17,7 +17,7 @@ sudo nixos-rebuild switch --flake /path/to/nixos-config#currolaptop
 sudo nixos-rebuild switch --flake ... --option ssl-cert-file /etc/ssl/proxy-certs/CARaiz.pem
 ```
 
-There is no CI, no Makefile, no linter, and no test suite. The only verification is a successful `nixos-rebuild switch`.
+There is no CI, Makefile, linter, or test suite. For a lightweight check, parse changed Nix files with `nix-instantiate --parse` and evaluate relevant flake attributes with `nix eval`. The full system check is a successful `nixos-rebuild switch`.
 
 ## Update opencode (unstable input)
 
@@ -40,10 +40,12 @@ idea-java21
 
 ## Key architecture facts
 
-- **One live host**: `currolaptop`. The flake also declares `server-docker-01` and `mininas`, but their `hosts/` directories do not exist — evaluating or building them will fail.
+- **One configured host**: `currolaptop`. The flake also declares `server-docker-01`, `mininas`, and `minipc-n150`, but their `hosts/` directories do not exist — evaluating or building those configurations will fail until the host files are added.
 - **`system` is hardcoded to `x86_64-linux`** in the `mkHost` factory in `flake.nix`. All hosts share this.
 - **`nixos-wsl.nixosModules.default` is loaded unconditionally for every host** in `mkHost`. Adding a non-WSL host requires restructuring `mkHost` or explicitly setting `wsl.enable = false`.
-- **`user.nix` is a plain attrset, not a NixOS module.** It is `import`-ed directly to get `mainUser`, `hostname`, `gitUser`, `gitEmail`. It is passed as `envFilePath` into `modules-dev/` files, which re-import it themselves.
+- **`hosts/currolaptop/user.nix` is a plain attrset, not a NixOS module.** `hosts/currolaptop/home.nix` imports it as `users` for host-specific modules and passes its path to `modules-dev/home.nix` as `envFilePath`; `modules-dev/home.nix` imports it as `envs` for common user configuration.
+- **SSH configuration is split by scope.** `modules/home/programs/ssh/common.nix` and `desktop.nix` are imported by `hosts/currolaptop/home.nix`; `modules-dev/home.nix` imports `modules-dev/home/programs/ssh/work.nix` and passes it the imported user data. The work GitLab block gets its login from `gitUser`.
+- **Home Manager SSH blocks use `programs.ssh.matchBlocks`.** Use Home Manager's lowercase option names such as `hostname`, `user`, `identityFile`, and `identitiesOnly`; `programs.ssh.settings` is not available in the pinned Home Manager release.
 - **`pkgsUnstable`** is threaded through `specialArgs` and available in any module that declares it in its function signature.
 - **`modules/common-configuration.nix`** and **`modules/git.nix`** reference `../users.nix` which does not exist at the repo root. Do not import these modules; they would fail to evaluate.
 
@@ -54,10 +56,12 @@ idea-java21
 | `hosts/currolaptop/` | The only active host (WSL2) |
 | `hosts/currolaptop/user.nix` | Pure data: `mainUser`, `hostname`, `gitUser`, `gitEmail` |
 | `modules-dev/configuration.nix` | Active system config: Docker, corp CA, dev packages |
-| `modules-dev/home.nix` | Active home-manager config: git, direnv, SOPS, corp CA bundle |
+| `modules-dev/home.nix` | Shared Home Manager config: git, direnv, SOPS, corp CA bundle; imports work SSH config |
+| `modules-dev/home/programs/ssh/work.nix` | Work GitLab SSH block; uses `users.gitUser` |
 | `modules-dev/cacerts/CARaiz.pem` | Corporate root CA (IGAE/MINHAC Spain); do not remove |
 | `modules/` | Library/template modules — mostly unused by active hosts |
 | `modules/nvim/` | Neovim home-manager module; imported by `currolaptop/home.nix` |
+| `modules/home/programs/ssh/` | Common and desktop SSH blocks; imported by `currolaptop/home.nix` |
 | `modules/wsl.nix` | WSL2 shim; imported by `currolaptop/configuration.nix` |
 | `modules/docker.nix` | Docker; imported by `modules-dev/configuration.nix` |
 | `dev-envs/java21/` | Dev shell: JDK 21.0.13 + Maven 3.9.8 + IntelliJ |

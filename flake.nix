@@ -4,15 +4,25 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    nix-index-database.url = "github:nix-community/nix-index-database";
-    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.05";
-    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, nix-index-database, nixos-wsl, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, nix-index-database, nixos-wsl, agenix, ... }:
     let
       system = "x86_64-linux";
       
@@ -41,6 +51,7 @@
               home-manager.backupFileExtension = "backup";
             }
             nixos-wsl.nixosModules.default
+            agenix.nixosModules.default
           ];
         };
     in {

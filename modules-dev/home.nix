@@ -14,6 +14,10 @@ let
   mainUser = envs.mainUser; 
 in
 {
+  imports = [
+    (import ./home/programs/ssh/work.nix { users = envs; })
+  ];
+
   home.username = mainUser;
   home.homeDirectory = "/home/${mainUser}";
   home.stateVersion = "25.05";
