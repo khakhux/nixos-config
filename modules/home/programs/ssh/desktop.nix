@@ -50,5 +50,10 @@
       identityFile = "~/.ssh/id_ed25519_home";
       identitiesOnly = true;
     };
+
+    "github-nanix" = {
+      hostname = "github.com";
+      identityFile = "~/.ssh/id_github_nanix";
+    };
   };
 }
