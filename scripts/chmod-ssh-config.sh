@@ -9,5 +9,5 @@ find ~/.ssh -maxdepth 1 -type f -name 'id_*' ! -name '*.pub' \
 find ~/.ssh -maxdepth 1 -type f -name '*.pub' \
   -exec chmod 644 {} +
 
-chmod 600 ~/.ssh/config
-chmod 644 ~/.ssh/known_hosts
+#chmod 600 ~/.ssh/config
+#chmod 644 ~/.ssh/known_hosts
