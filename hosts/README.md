@@ -12,6 +12,20 @@ rebuilds; use only the matching host target.
 Other host directories and flake declarations are legacy, experimental, or
 incomplete. Do not treat them as active without confirmation.
 
+## Fast checks
+
+From the repository root, check changed files (staged, unstaged, and untracked)
+in active hosts and shared configuration:
+
+```sh
+nix shell --inputs-from . nixpkgs#nixfmt-rfc-style nixpkgs#shellcheck --command bash scripts/check-fast.sh
+```
+
+This parses and format-checks changed Nix files, and runs `bash -n` and
+ShellCheck on changed shell scripts. It skips legacy host directories and
+does not evaluate, build, or switch a host. The tools are supplied by the
+Nix shell if they are not installed locally.
+
 ## Flake platform selection
 
 `flake.nix` enables `nixos-wsl.nixosModules.default` only for hosts declared
