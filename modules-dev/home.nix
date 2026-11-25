@@ -21,6 +21,9 @@ in
   home.username = mainUser;
   home.homeDirectory = "/home/${mainUser}";
   home.stateVersion = "25.05";
+  # SSH may rewrite known_hosts; keep Home Manager's pinned keys in a separate file.
+  programs.ssh.matchBlocks."*".extraOptions.UserKnownHostsFile =
+    "~/.ssh/known_hosts ~/.ssh/known_hosts_nix";
 
   # Environment variables for SOPS
   home.sessionVariables = {
