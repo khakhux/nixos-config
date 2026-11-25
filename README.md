@@ -25,6 +25,9 @@ For routine Nix input and system updates, see [nix-update.md](nix-update.md). Ag
 │   ├── docker.nix
 │   └── wsl.nix
 ├── dev-envs/java21/
+├── secrets/
+│   ├── agenix-rules.nix        # agenix recipients
+│   └── github-token.age
 └── scripts/update-opencode.sh
 ```
 
@@ -135,23 +138,39 @@ agenix refs:
 - https://ryantm.github.io/agenix/tutorial/
 - https://github.com/ryantm/agenix/blob/main/doc/reference.md
 
+Encrypted files and their rules live in `secrets/`. Run agenix from that
+directory (or a subdirectory): it discovers `agenix-rules.nix` in the current
+directory or any parent, and rule keys are bare filenames relative to it.
+
 ## 1. Create encrypted property
 
 Example for creating `github-token.age` encrypted with `~/.ssh/id_github` private key:
 ```shell
-nix run github:ryantm/agenix -- -e secrets/github-token.age -i ~/.ssh/id_github
+cd secrets
+nix run github:ryantm/agenix -- -e github-token.age -i ~/.ssh/id_github
+```
+
+Piped input works without an editor and replaces the cleartext directly:
+```shell
+printf 'VALUE' | nix run github:ryantm/agenix -- -e github-token.age
 ```
 
 ## 2. Add to agenix config
 
-secrets.nix
+secrets/agenix-rules.nix
 ```nix
 let
   host = "PUBLIC_KEY";
 in
 {
-  "secrets/github-token.age".publicKeys = [ host ];
+  "github-token.age".publicKeys = [ host ];
 }
+```
+
+Check that the recipients match without decrypting:
+```shell
+cd secrets
+nix run github:ryantm/agenix -- -c
 ```
 
 ```shell

@@ -66,7 +66,7 @@ idea-java21
 | `modules/docker.nix` | Docker; imported by `modules-dev/configuration.nix` |
 | `dev-envs/java21/` | Dev shell: JDK 21.0.13 + Maven 3.9.8 + IntelliJ |
 | `scripts/update-opencode.sh` | Only automation script |
-| `secrets/` + `secrets.nix` | agenix encrypted secret files and their recipient public keys |
+| `secrets/` | agenix encrypted secret files and `secrets/agenix-rules.nix` recipient keys |
 
 ## Corporate environment notes
 
@@ -77,10 +77,10 @@ idea-java21
 
 ## Secrets (agenix)
 
-Secrets are agenix-encrypted files in `secrets/`, registered in `secrets.nix`.
-Never commit plaintext secrets or private keys. For any change that adds or
-modifies a secret, load the `manage-secrets` skill
-(`.opencode/skills/manage-secrets/SKILL.md`).
+Secrets are agenix-encrypted files in `secrets/`, with recipients in
+`secrets/agenix-rules.nix`. Never commit plaintext secrets or private keys. For any
+change that adds or modifies a secret, load the `secrets` skill (or the
+`manage-secrets` checklist alternative).
 
 ## Nix channels
 
