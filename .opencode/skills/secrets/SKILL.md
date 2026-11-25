@@ -9,22 +9,20 @@ Single-host setup (`currolaptop`). Recipients live in `secrets/agenix-rules.nix`
 (currently only the `cacu` user key). Encrypted blobs live next to it as
 `secrets/*.age`. Never commit plaintext secrets or private keys.
 
-## `agenix` is not on PATH here
+## Use the repo's pinned agenix app
 
-Don't run bare `agenix`. Use:
+Don't run bare `agenix` or `nix run github:ryantm/agenix`. From the repo root:
 
 ```bash
-nix run github:ryantm/agenix -- <args>
+nix run .#agenix -- <args>
 ```
 
-## Critical: run from `secrets/`
+## Critical: bare filenames
 
-agenix finds `agenix-rules.nix` in the **current directory or any parent**, and
-resolves rule keys relative to that file. Run from `secrets/` (or a
-subdirectory) and pass bare filenames (`github-token.age`), not
-`secrets/github-token.age` — prefixed paths fail with `There is no rule for ...`
-because keys are resolved relative to the rules file. From the repo root, set
-`AGENIX_RULES=secrets/agenix-rules.nix`.
+The app exports `AGENIX_RULES` pointing at `secrets/agenix-rules.nix`, so there
+is no need to `cd secrets`. Rule keys are resolved relative to that file: pass
+bare filenames (`github-token.age`), never `secrets/github-token.age`, or
+agenix fails with `There is no rule for ...`.
 
 Decryption identity is `/home/cacu/.ssh/id_github` (forced by
 `age.identityPaths` in `hosts/currolaptop/configuration.nix`). agenix only
@@ -36,17 +34,16 @@ auto-detects `id_rsa`/`id_ed25519`, so pass `-i` explicitly when decrypting.
    ```nix
    { "<name>.age".publicKeys = [ cacu ]; }
    ```
-2. Encrypt from `secrets/`. Piped stdin replaces the cleartext and needs no
+2. Encrypt from the repo root. Piped stdin replaces the cleartext and needs no
    editor or decryption identity:
    ```bash
-   cd secrets
-   printf 'SECRET_VALUE' | nix run github:ryantm/agenix -- -e <name>.age
+   printf 'SECRET_VALUE' | nix run .#agenix -- -e <name>.age
    ```
    Ask the user for the value if it must not pass through the shell history;
    never invent a value.
 3. Verify it decrypts before trusting it (pipes fail silently):
    ```bash
-   nix run github:ryantm/agenix -- -d <name>.age -i ~/.ssh/id_github >/dev/null && echo ok
+   nix run .#agenix -- -d <name>.age -i ~/.ssh/id_github >/dev/null && echo ok
    ```
    Never print the plaintext to the conversation.
 4. From the repo root: `git add secrets/<name>.age secrets/agenix-rules.nix`.
@@ -54,18 +51,16 @@ auto-detects `id_rsa`/`id_ed25519`, so pass `-i` explicitly when decrypting.
 ## Edit / view an existing secret
 
 ```bash
-cd secrets
-nix run github:ryantm/agenix -- -e <name>.age -i ~/.ssh/id_github  # $EDITOR, or pipe via stdin
-nix run github:ryantm/agenix -- -d <name>.age -i ~/.ssh/id_github  # decrypt to stdout (avoid)
+nix run .#agenix -- -e <name>.age -i ~/.ssh/id_github  # $EDITOR, or pipe via stdin
+nix run .#agenix -- -d <name>.age -i ~/.ssh/id_github  # decrypt to stdout (avoid)
 ```
 
 ## Check / re-key
 
 ```bash
-cd secrets
-nix run github:ryantm/agenix -- -c                      # recipients match agenix-rules.nix
-nix run github:ryantm/agenix -- -r -i ~/.ssh/id_github  # re-encrypt after a recipient change
-cd .. && git add secrets/*.age secrets/agenix-rules.nix
+nix run .#agenix -- -c                      # recipients match agenix-rules.nix
+nix run .#agenix -- -r -i ~/.ssh/id_github  # re-encrypt after a recipient change
+git add secrets/*.age secrets/agenix-rules.nix
 ```
 
 `-c` is safe: it reads the age header only, never the plaintext.
@@ -106,7 +101,8 @@ Check access with `stat` (mode/owner), never with `cat`.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `agenix needs a rules file` / `There is no rule for ...` | ran from repo root, or key still prefixed with `secrets/` | `cd secrets` (or set `AGENIX_RULES=secrets/agenix-rules.nix`), use bare filenames and keys |
+| `There is no rule for ...` | path prefixed with `secrets/` or key not registered | use a bare filename, add the bare key to `secrets/agenix-rules.nix` |
+| `agenix needs a rules file` | running the CLI outside this repo's flake | run `nix run .#agenix` from the repo root |
 | `No identity found` | default identities are `id_rsa`/`id_ed25519` | add `-i ~/.ssh/id_github` |
 | decrypts to empty/garbage | a piped-in value generator failed silently | verify the plaintext, then `-d` after `-e` |
 | `permission denied` in a user service | secret is root-owned | set `owner`/`group`; do not widen the mode |

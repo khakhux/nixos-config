@@ -138,39 +138,37 @@ agenix refs:
 - https://ryantm.github.io/agenix/tutorial/
 - https://github.com/ryantm/agenix/blob/main/doc/reference.md
 
-Encrypted files and their rules live in `secrets/`. Run agenix from that
-directory (or a subdirectory): it discovers `agenix-rules.nix` in the current
-directory or any parent, and rule keys are bare filenames relative to it.
+Encrypted files and their rules live in `secrets/`. Use the repo's pinned
+`agenix` app from the repo root: `nix run .#agenix -- ...`. It sets
+`AGENIX_RULES` to `secrets/agenix-rules.nix`; rule keys are bare filenames.
 
-## 1. Create encrypted property
+### 1. Create encrypted property
 
 Example for creating `github-token.age` encrypted with `~/.ssh/id_github` private key:
 ```shell
-cd secrets
-nix run github:ryantm/agenix -- -e github-token.age -i ~/.ssh/id_github
+nix run .#agenix -- -e github-token.age -i ~/.ssh/id_github
 ```
 
 Piped input works without an editor and replaces the cleartext directly:
 ```shell
-printf 'VALUE' | nix run github:ryantm/agenix -- -e github-token.age
+printf 'VALUE' | nix run .#agenix -- -e github-token.age
 ```
 
-## 2. Add to agenix config
+### 2. Add to agenix config
 
 secrets/agenix-rules.nix
 ```nix
 let
-  host = "PUBLIC_KEY";
+  cacu = "ssh-ed25519 AAAAC3... cacu@mininas";
 in
 {
-  "github-token.age".publicKeys = [ host ];
+  "github-token.age".publicKeys = [ cacu ];
 }
 ```
 
 Check that the recipients match without decrypting:
 ```shell
-cd secrets
-nix run github:ryantm/agenix -- -c
+nix run .#agenix -- -c
 ```
 
 ```shell
@@ -182,9 +180,9 @@ To check that the secret was installed without displaying its contents:
 sudo -u cacu test -r /run/agenix/github-token && echo "GitHub token secret is readable"
 ```
 
-## 3. Configure token usage
+### 3. Configure token usage
 
-configuration.nix
+modules-dev/configuration.nix
 ```nix
   age.secrets.github-token = {
     file = ../secrets/github-token.age;

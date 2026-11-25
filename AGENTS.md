@@ -1,10 +1,14 @@
 # AGENTS.md — NixOS Config
 
-Personal NixOS flake for a single active host (`currolaptop`, WSL2 on Windows). The `modules/` tree is mostly library/template code; the live configuration lives in `modules-dev/` and `hosts/currolaptop/`. For routine updates, follow [nix-update.md](nix-update.md).
+Personal NixOS flake. The active hosts are `currolaptop` (NixOS-WSL2), `mininas` (server), and `minipc-n150` (desktop); see [hosts/README.md](hosts/README.md). The `modules/` tree is mostly library/template code; live configurations are in `hosts/` and shared modules. For routine updates, follow [nix-update.md](nix-update.md).
 
 ## Apply the config
 
 ```bash
+# Before any host-specific evaluation, build, test, or apply:
+hostname
+# Confirm this is the intended active host and that its name matches the flake target.
+
 # Short alias (defined in modules-dev/home.nix and modules/common-home.nix):
 nrs
 # Expands to:
@@ -17,7 +21,7 @@ sudo nixos-rebuild switch --flake /path/to/nixos-config#currolaptop
 sudo nixos-rebuild switch --flake ... --option ssl-cert-file /etc/ssl/proxy-certs/CARaiz.pem
 ```
 
-There is no CI, Makefile, linter, or test suite. For a lightweight check, parse changed Nix files with `nix-instantiate --parse` and evaluate relevant flake attributes with `nix eval`. The full system check is a successful `nixos-rebuild switch`.
+There is no CI, Makefile, linter, or test suite. Before host-specific checks or rebuilds, run `hostname` and confirm the intended host target; do not assume the current host from prior session context. For a lightweight check, parse changed Nix files with `nix-instantiate --parse` and evaluate the intended host's flake attribute with `nix eval`. The full system check is a successful `nixos-rebuild switch`.
 
 ## Update opencode (unstable input)
 
@@ -40,12 +44,13 @@ idea-java21
 
 ## Key architecture facts
 
-- **One configured host**: `currolaptop`. The flake also declares `server-docker-01`, `mininas`, and `minipc-n150`, but their `hosts/` directories do not exist — evaluating or building those configurations will fail until the host files are added.
+- **Active hosts**: `currolaptop`, `mininas`, and `minipc-n150`. Other host directories/configurations are legacy or incomplete; see [hosts/README.md](hosts/README.md) and do not treat them as active without confirmation.
 - **`system` is hardcoded to `x86_64-linux`** in the `mkHost` factory in `flake.nix`. All hosts share this.
-- **`nixos-wsl.nixosModules.default` is loaded unconditionally for every host** in `mkHost`. Adding a non-WSL host requires restructuring `mkHost` or explicitly setting `wsl.enable = false`.
+- **`nixos-wsl.nixosModules.default` is loaded unconditionally for every flake host** in `mkHost`. This matches `currolaptop` only; native `mininas` and `minipc-n150` need a platform-aware host factory before using those flake outputs to build/apply. See `hosts/README.md`.
 - **`hosts/currolaptop/user.nix` is a plain attrset, not a NixOS module.** `hosts/currolaptop/home.nix` imports it as `users` for host-specific modules and passes its path to `modules-dev/home.nix` as `envFilePath`; `modules-dev/home.nix` imports it as `envs` for common user configuration.
 - **SSH configuration is split by scope.** `modules/home/programs/ssh/common.nix` and `desktop.nix` are imported by `hosts/currolaptop/home.nix`; `modules-dev/home.nix` imports `modules-dev/home/programs/ssh/work.nix` and passes it the imported user data. The work GitLab block gets its login from `gitUser`.
 - **Home Manager SSH blocks use `programs.ssh.matchBlocks`.** Use Home Manager's lowercase option names such as `hostname`, `user`, `identityFile`, and `identitiesOnly`; `programs.ssh.settings` is not available in the pinned Home Manager release.
+- **Agenix system identity transition**: `hosts/currolaptop/configuration.nix` now uses agenix's default `/etc/ssh/ssh_host_*` identities. Before applying that change on `currolaptop`, generate its host key with `sudo ssh-keygen -A`, add the host public key to `secrets/agenix-rules.nix` alongside the user recipient, then rekey. Keep the user recipient for CLI editing/recovery; do not use another host's key.
 - **`pkgsUnstable`** is threaded through `specialArgs` and available in any module that declares it in its function signature.
 - **`modules/common-configuration.nix`** and **`modules/git.nix`** reference `../users.nix` which does not exist at the repo root. Do not import these modules; they would fail to evaluate.
 
@@ -53,7 +58,10 @@ idea-java21
 
 | Path | Role |
 |---|---|
-| `hosts/currolaptop/` | The only active host (WSL2) |
+| `hosts/` | Active host descriptions in `hosts/README.md` |
+| `hosts/currolaptop/` | Active WSL2 development host |
+| `hosts/mininas/` | Active native NixOS server |
+| `hosts/minipc-n150/` | Active native NixOS desktop |
 | `hosts/currolaptop/user.nix` | Pure data: `mainUser`, `hostname`, `gitUser`, `gitEmail` |
 | `modules-dev/configuration.nix` | Active system config: Docker, corp CA, dev packages |
 | `modules-dev/home.nix` | Shared Home Manager config: git, direnv, SOPS, corp CA bundle; imports work SSH config |
@@ -78,9 +86,8 @@ idea-java21
 ## Secrets (agenix)
 
 Secrets are agenix-encrypted files in `secrets/`, with recipients in
-`secrets/agenix-rules.nix`. Never commit plaintext secrets or private keys. For any
-change that adds or modifies a secret, load the `secrets` skill (or the
-`manage-secrets` checklist alternative).
+`secrets/agenix-rules.nix`. Never commit plaintext secrets or private keys.
+For secret changes, load the `secrets` skill.
 
 ## Nix channels
 

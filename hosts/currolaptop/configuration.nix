@@ -23,7 +23,7 @@ in
 
   environment.sessionVariables.REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-bundle.crt";
 
-  # for using age ssh keys
+  # NixOS host SSH keys are the agenix decryption identities.
   services.openssh.enable = true;
 
   # WSL has no host SSH keys; use the key that matches the agenix recipient.

@@ -55,6 +55,16 @@
           ];
         };
     in {
+      apps.${system}.agenix = {
+        type = "app";
+        program = let
+          pkgs = nixpkgs.legacyPackages.${system};
+          agenixCli = agenix.packages.${system}.default;
+        in "${pkgs.writeShellScriptBin "agenix" ''
+          export AGENIX_RULES="$(git -C "$PWD" rev-parse --show-toplevel)/secrets/agenix-rules.nix"
+          exec ${agenixCli}/bin/agenix "$@"
+        ''}/bin/agenix";
+      };
       nixosConfigurations = {
         server-docker-01 = mkHost "server-docker-01";
         mininas = mkHost "mininas";
