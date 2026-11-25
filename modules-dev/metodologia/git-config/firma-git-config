@@ -1,6 +1,6 @@
 [filter "sops-dotenv"]
-    clean    = sops-clean.sh dotenv
-    smudge   = sops-smudge.sh dotenv
+    clean    = sops-clean.sh dotenv %f
+    smudge   = sops-smudge.sh dotenv %f
     required = true
 
 [diff "sops"]
