@@ -12,9 +12,7 @@ rebuilds; use only the matching host target.
 Other host directories and flake declarations are legacy, experimental, or
 incomplete. Do not treat them as active without confirmation.
 
-## Important flake caveat
+## Flake platform selection
 
-`flake.nix` currently loads `nixos-wsl.nixosModules.default` unconditionally
-through `mkHost`. That matches `currolaptop`, but not the native NixOS hosts.
-Do not assume the flake can correctly build or apply `mininas` or
-`minipc-n150` until the host factory is made platform-aware.
+`flake.nix` enables `nixos-wsl.nixosModules.default` only for hosts declared
+with `isWsl = true` (`currolaptop`). Native hosts omit the WSL module.

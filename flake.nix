@@ -26,7 +26,7 @@
     let
       system = "x86_64-linux";
       
-      mkHost = hostName: 
+      mkHost = { hostName, isWsl ? false }:
         let
           users = import ./hosts/${hostName}/user.nix;
           pkgsUnstable = import inputs.nixpkgs-unstable {
@@ -50,9 +50,8 @@
               home-manager.users.${users.mainUser} = import ./hosts/${hostName}/home.nix;
               home-manager.backupFileExtension = "backup";
             }
-            nixos-wsl.nixosModules.default
             agenix.nixosModules.default
-          ];
+          ] ++ nixpkgs.lib.optional isWsl nixos-wsl.nixosModules.default;
         };
     in {
       apps.${system}.agenix = {
@@ -66,12 +65,12 @@
         ''}/bin/agenix";
       };
       nixosConfigurations = {
-        server-docker-01 = mkHost "server-docker-01";
-        mininas = mkHost "mininas";
-        currolaptop = mkHost "currolaptop";
-        minipc-n150 = mkHost "minipc-n150";
+        server-docker-01 = mkHost { hostName = "server-docker-01"; };
+        mininas = mkHost { hostName = "mininas"; };
+        currolaptop = mkHost { hostName = "currolaptop"; isWsl = true; };
+        minipc-n150 = mkHost { hostName = "minipc-n150"; };
         # Add more hosts like this:
-        # other-host = mkHost "other-host";
+        # other-host = mkHost { hostName = "other-host"; };
       };
     };
 }
