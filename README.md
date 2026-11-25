@@ -123,5 +123,66 @@ idea-java21
 ./scripts/update-opencode.sh --rebuild
 ```
 
+## Add secrets
+
+Currently this system uses [agenix](https://github.com/ryantm/agenix/) to manage secrets such as github token to be used on `nix flake update`.
+
+Private keys and other more sensible data are not included in the repo, with or without agenix.
+
+There are other options such as [sops-nix](https://mynixos.com/sops-nix) (more complex) or [sops](https://getsops.io/) (more complex and secrets are in plain on worktree). There is also [SecretSpec](https://secretspec.dev/) but is target is to encrypt properties on application development (see [SecretSpec vs SOPS](https://secretspec.dev/blog/but-i-use-sops/)).
+
+agenix refs:
+- https://ryantm.github.io/agenix/tutorial/
+- https://github.com/ryantm/agenix/blob/main/doc/reference.md
+
+## 1. Create encrypted property
+
+Example for creating `github-token.age` encrypted with `~/.ssh/id_github` private key:
+```shell
+nix run github:ryantm/agenix -- -e secrets/github-token.age -i ~/.ssh/id_github
+```
+
+## 2. Add to agenix config
+
+secrets.nix
+```nix
+let
+  host = "PUBLIC_KEY";
+in
+{
+  "secrets/github-token.age".publicKeys = [ host ];
+}
+```
+
+```shell
+nrs
+```
+
+To check that the secret was installed without displaying its contents:
+```shell
+sudo -u cacu test -r /run/agenix/github-token && echo "GitHub token secret is readable"
+```
+
+## 3. Configure token usage
+
+configuration.nix
+```nix
+  age.secrets.github-token = {
+    file = ../secrets/github-token.age;
+    owner = envs.mainUser;
+    mode = "0400";
+  };
+
+  # github access token to be used in nix flake update, file content is: access-tokens = github.com=TOKEN
+  nix.extraOptions = ''
+    !include ${config.age.secrets.github-token.path}
+  '';
+```
+
+```shell
+nrs
+```
+
+
 # Future Enhancements
 

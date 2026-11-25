@@ -66,6 +66,7 @@ idea-java21
 | `modules/docker.nix` | Docker; imported by `modules-dev/configuration.nix` |
 | `dev-envs/java21/` | Dev shell: JDK 21.0.13 + Maven 3.9.8 + IntelliJ |
 | `scripts/update-opencode.sh` | Only automation script |
+| `secrets/` + `secrets.nix` | agenix encrypted secret files and their recipient public keys |
 
 ## Corporate environment notes
 
@@ -73,6 +74,13 @@ idea-java21
 - `docker pull` against `harbor.dockersl.central.sepg.minhac.age` needs Docker daemon trust in addition to the normal system CA bundle. The Harbor certificate chain uses the `Comunica2` intermediate under `CARaiz`, and `modules-dev/configuration.nix` now installs both certificates into `security.pki.certificateFiles` and writes a combined bundle to `/etc/docker/certs.d/harbor.dockersl.central.sepg.minhac.age/ca.crt` for the daemon.
 - An **age key** is auto-generated on first home-manager activation (`~/.config/sops/age/keys.txt`). After generation, add the public key to `.sops.yaml` files in other repos that use SOPS encryption.
 - `home-manager.backupFileExtension = "backup"` is set globally — conflicting unmanaged files are renamed to `<file>.backup` rather than causing a failure.
+
+## Secrets (agenix)
+
+Secrets are agenix-encrypted files in `secrets/`, registered in `secrets.nix`.
+Never commit plaintext secrets or private keys. For any change that adds or
+modifies a secret, load the `manage-secrets` skill
+(`.opencode/skills/manage-secrets/SKILL.md`).
 
 ## Nix channels
 
