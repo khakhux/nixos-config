@@ -11,13 +11,12 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      (import ../../modules/common-configuration.nix {
-        inherit config lib pkgs;
+      (import ../../modules/server.nix {
+        inherit lib;
         interfaceName = "enp1s0";
         ipAddress = ips.mininas;
         extraGroups = "docker";
       })
-      ../../modules/ssh-server.nix
       ../../modules/docker.nix
       ../../services/radicale.nix
       #(import ./syncthing.nix mainUser)
