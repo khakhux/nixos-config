@@ -1,9 +1,9 @@
 { config, lib, pkgs, ... }:
 
 let
-  #ports = import ../../ports.nix;
-  #ips = import ../../ips.nix;
-  users = import ../../users.nix;
+  #ports = import ../../../ports.nix;
+  #ips = import ../../../ips.nix;
+  users = import ../../../users.nix;
   mainUser = users.mainUser;
 in
 
@@ -11,7 +11,7 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      ../../modules/desktop.nix
+      ../../../modules/desktop.nix
     ];
 
   # Bootloader.

@@ -1,22 +1,22 @@
 { config, lib, pkgs, ... }:
 
 let
-  ports = import ../../ports.nix;
-  users = import ../../users.nix;
+  ports = import ../../../ports.nix;
+  users = import ../../../users.nix;
 in
 
 {
   imports =
     [
       ./hardware-configuration.nix
-      (import ../../modules/server.nix {
+      (import ../../../modules/server.nix {
         inherit lib;
         interfaceName = "ens18";
         ipAddress = "192.168.1.248";
         extraGroups = "docker";
       })
-      ../../modules/docker.nix
-      ../../modules/proxmox-guest.nix
+      ../../../modules/docker.nix
+      ../../../modules/proxmox-guest.nix
     ];
 
   networking = {

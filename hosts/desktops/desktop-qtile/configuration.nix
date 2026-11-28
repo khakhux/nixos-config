@@ -1,20 +1,20 @@
 { config, lib, pkgs, ... }:
 
 let
-  users = import ../users.nix;
+  users = import ../../../users.nix;
 in
 
 {
   imports =
     [
       ./hardware-configuration.nix
-      (import ../../modules/common-configuration.nix {
+      (import ../../../modules/common-configuration.nix {
         inherit config lib pkgs;
         interfaceName = "ens18";
         ipAddress = "192.168.1.249";
       })
-      ../../modules/proxmox-guest.nix
-      ../../modules/desktop-qtile.nix
+      ../../../modules/proxmox-guest.nix
+      ../../../modules/desktop-qtile.nix
     ];
 
   # Enable RDP Access

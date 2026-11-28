@@ -26,9 +26,12 @@
     let
       system = "x86_64-linux";
       
-      mkHost = { hostName, isWsl ? false }:
+      mkHost = { hostName, hostGroup ? null, isWsl ? false }:
         let
-          users = import ./hosts/${hostName}/user.nix;
+          hostDir =
+            if hostGroup == null then ./hosts/${hostName}
+            else ./hosts/${hostGroup}/${hostName};
+          users = import (hostDir + "/user.nix");
           pkgsUnstable = import inputs.nixpkgs-unstable {
             inherit system;
             config.allowUnfree = true;
@@ -41,13 +44,13 @@
             inherit nixos-wsl;
           };
           modules = [
-            ./hosts/${hostName}/configuration.nix
+            (hostDir + "/configuration.nix")
             nix-index-database.nixosModules.default
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.${users.mainUser} = import ./hosts/${hostName}/home.nix;
+              home-manager.users.${users.mainUser} = import (hostDir + "/home.nix");
               home-manager.backupFileExtension = "backup";
             }
             agenix.nixosModules.default
@@ -65,10 +68,10 @@
         ''}/bin/agenix";
       };
       nixosConfigurations = {
-        server-docker-01 = mkHost { hostName = "server-docker-01"; };
-        mininas = mkHost { hostName = "mininas"; };
+        server-docker-01 = mkHost { hostName = "server-docker-01"; hostGroup = "servers"; };
+        mininas = mkHost { hostName = "mininas"; hostGroup = "servers"; };
         currolaptop = mkHost { hostName = "currolaptop"; isWsl = true; };
-        minipc-n150 = mkHost { hostName = "minipc-n150"; };
+        minipc-n150 = mkHost { hostName = "minipc-n150"; hostGroup = "desktops"; };
         # Add more hosts like this:
         # other-host = mkHost { hostName = "other-host"; };
       };

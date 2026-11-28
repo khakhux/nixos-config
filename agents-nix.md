@@ -177,17 +177,19 @@ nixos-config/
 ## Host Construction Pattern (`mkHost` factory)
 
 ```nix
-mkHost = hostName:
+mkHost = { hostName, hostGroup ? null, ... }:
   let
-    users = import ./hosts/${hostName}/user.nix;   # Pure attrset: mainUser, hostname, gitUser, gitEmail
+    hostDir = if hostGroup == null then ./hosts/${hostName}
+              else ./hosts/${hostGroup}/${hostName};
+    users = import (hostDir + "/user.nix");   # Pure attrset: mainUser, hostname, gitUser, gitEmail
     pkgsUnstable = import inputs.nixpkgs-unstable { ... config.allowUnfree = true; };
   in nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";          # Hardcoded — all hosts are x86_64
     specialArgs = { inherit pkgsUnstable; };  # Passed into all modules
     modules = [
-      ./hosts/${hostName}/configuration.nix
+      (hostDir + "/configuration.nix")
       home-manager.nixosModules.home-manager
-      { home-manager.users.${users.mainUser} = import ./hosts/${hostName}/home.nix;
+      { home-manager.users.${users.mainUser} = import (hostDir + "/home.nix");
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.backupFileExtension = "backup"; }
@@ -421,4 +423,3 @@ Wrote file successfully.
 - `nix-update.md` is now the preferred write-up for the normal `nix flake update` -> `nixos-rebuild test` -> `switch` flow.
 - `currolaptop` now installs `pkgsUnstable.opencode`, `pkgsUnstable.openspec`, `pkgsUnstable.codex`, and `uv`, and its home config adds `~/.local/bin` to `PATH` for Spec Kit helpers.
 - `nixos-wsl` moved to `release-25.05` and now follows `nixpkgs-unstable`.
-
