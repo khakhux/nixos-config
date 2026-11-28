@@ -12,6 +12,9 @@ rebuilds; use only the matching host target.
 Other host directories and flake declarations are legacy, experimental, or
 incomplete. Do not treat them as active without confirmation.
 
+Server configurations live in `hosts/servers/`, desktop configurations in
+`hosts/desktops/`, and the WSL development host in `hosts/currolaptop/`.
+
 ## Fast checks
 
 From the repository root, check changed files (staged, unstaged, and untracked)

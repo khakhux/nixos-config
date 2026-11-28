@@ -1,9 +1,9 @@
 { config, lib, pkgs, ... }:
 
 let
-  ports = import ../../ports.nix;
-  ips = import ../../ips.nix;
-  users = import ../../users.nix;
+  ports = import ../../../ports.nix;
+  ips = import ../../../ips.nix;
+  users = import ../../../users.nix;
   mainUser = users.mainUser;
 in
 
@@ -11,13 +11,13 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      (import ../../modules/common-configuration.nix {
+      (import ../../../modules/common-configuration.nix {
         inherit config lib pkgs;
         interfaceName = "enp1s0";
         ipAddress = ips.mininas;
         extraGroups = "docker";
       })
-      ../../modules/docker.nix
+      ../../../modules/docker.nix
       #(import ./syncthing.nix mainUser)
     ];
 
@@ -79,7 +79,7 @@ in
     jq
     gocatcli
     # system configued script example, run with mys-awesone-script
-    (import ../../scripts/my-awesome-script.nix { inherit pkgs; })
+    (import ../../../scripts/my-awesome-script.nix { inherit pkgs; })
     mosquitto
   ];
 
@@ -96,7 +96,7 @@ in
     # Setting the shell to nologin prevents interactive SSH shell access
     shell = pkgs.shadow; 
     openssh.authorizedKeys.keyFiles = [
-      ../../ssh-keys/id_ed25519_mi9t.pub
+      ../../../ssh-keys/id_ed25519_mi9t.pub
       ./docker_data_argea.pub
     ];
   };

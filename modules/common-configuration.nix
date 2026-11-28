@@ -1,17 +1,11 @@
 # modules/common-configuration.nix
-{ config, lib, pkgs, ... }@args:
+{ config, pkgs, ... }:
 
 let
-  interfaceName = args.interfaceName or null;
-  ipAddress = args.ipAddress or null;
-  extraGroups = args.extraGroups or [];
   users = import ../users.nix;
 in
 
 {
-  imports = lib.optional (interfaceName != null && ipAddress != null)
-    (import ./static-network.nix { inherit interfaceName ipAddress; });
-  
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -36,7 +30,7 @@ in
 
   users.users.${users.mainUser} = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ] ++ lib.toList extraGroups; # Enable 'sudo' for the user.
+    extraGroups = [ "wheel" ]; # Enable 'sudo' for the user.
     packages = with pkgs; [
       tree
     ];

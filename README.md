@@ -62,12 +62,14 @@ modules-dev/
         └── ssh/
             └── work.nix (gitlab)
 hosts/
-└── currolaptop 
-    └── home.nix (imports common.nix, desktop.nix) (imports work.nix through modules-dev/home.nix)
-└── minipc-n150
-    └── home.nix (imports desktop.nix) (imports common.nix through modules/common-home.nix)
-└── mininas, raspberry
-    └── home.nix (import common.nix through modules/common-home.nix)
+├── currolaptop/
+│   └── home.nix (imports common.nix and desktop.nix; work.nix via modules-dev/home.nix)
+├── desktops/
+│   └── minipc-n150/
+│       └── home.nix (imports desktop.nix; common.nix via modules/common-home.nix)
+└── servers/
+    └── mininas/
+        └── home.nix (imports common.nix via modules/common-home.nix)
 ```
 
 ## Apply the configuration
@@ -91,7 +93,11 @@ sudo nixos-rebuild switch --flake /path/to/nixos-config#currolaptop \
   --option ssl-cert-file /etc/ssl/proxy-certs/CARaiz.pem
 ```
 
-The flake currently declares `server-docker-01`, `mininas`, and `minipc-n150` as well, but their `hosts/` directories are absent. Only `currolaptop` has a complete host configuration. The host factory also loads the NixOS-WSL module unconditionally, so supporting a non-WSL host requires adjusting that factory.
+The flake also declares `server-docker-01`, `mininas`, and `minipc-n150`.
+Server and desktop configurations are under `hosts/servers/` and
+`hosts/desktops/` respectively. `server-docker-01` is incomplete; see
+`hosts/README.md` for active hosts. The NixOS-WSL module is loaded only for
+`currolaptop`.
 
 There is no CI or test suite. For lightweight validation of Nix edits, parse changed files with `nix-instantiate --parse` and evaluate relevant configuration attributes with `nix eval`. The full system validation is a successful `nixos-rebuild switch`.
 
@@ -202,4 +208,3 @@ nrs
 
 
 # Future Enhancements
-

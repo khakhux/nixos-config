@@ -15,10 +15,9 @@ nixos/
     └── hardened-ssh.nix
     └── ...
 └── hosts/
-    └── proxmox-desktop/
-        ├── configuration.nix
-        └── home.nix
-        └── hardware-configuration.nix
+    └── desktops/
+        └── proxmox-desktop/
+            └── home.nix
 ```
 
 # Installation
@@ -221,4 +220,4 @@ nixos-install
 No:
 - mosquitto (lo instalo como addon de HASSOS)
 - install HACS
-- 
+-

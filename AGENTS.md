@@ -60,8 +60,8 @@ idea-java21
 |---|---|
 | `hosts/` | Active host descriptions in `hosts/README.md` |
 | `hosts/currolaptop/` | Active WSL2 development host |
-| `hosts/mininas/` | Active native NixOS server |
-| `hosts/minipc-n150/` | Active native NixOS desktop |
+| `hosts/servers/mininas/` | Active native NixOS server |
+| `hosts/desktops/minipc-n150/` | Active native NixOS desktop |
 | `hosts/currolaptop/user.nix` | Pure data: `mainUser`, `hostname`, `gitUser`, `gitEmail` |
 | `modules-dev/configuration.nix` | Active system config: Docker, corp CA, dev packages |
 | `modules-dev/home.nix` | Shared Home Manager config: git, direnv, SOPS, corp CA bundle; imports work SSH config |

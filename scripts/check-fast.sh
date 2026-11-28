@@ -17,7 +17,7 @@ for file in "${changed_files[@]}"; do
   [[ -f "$file" ]] || continue
   case "$file" in
     flake.nix|ips.nix|ports.nix|users.nix|\
-    hosts/currolaptop/*|hosts/mininas/*|hosts/minipc-n150/*|\
+    hosts/currolaptop/*|hosts/servers/mininas/*|hosts/desktops/minipc-n150/*|\
     modules/*|modules-dev/*|services/*|secrets/*|\
     scripts/*|dev-envs/java21/*)
       case "$file" in

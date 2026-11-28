@@ -12,7 +12,7 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      ../../modules/common-configuration.nix
+      ../../../modules/desktop.nix
     ];
 
   # Bootloader.
