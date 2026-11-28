@@ -2,7 +2,7 @@
 
 let
   ports = import ../../ports.nix;
-  users = import ../users.nix;
+  users = import ../../users.nix;
 in
 
 {
@@ -15,6 +15,7 @@ in
         ipAddress = "192.168.1.248";
         extraGroups = "docker";
       })
+      ../../modules/ssh-server.nix
       ../../modules/docker.nix
       ../../modules/proxmox-guest.nix
     ];

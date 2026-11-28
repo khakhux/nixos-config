@@ -12,6 +12,7 @@ in
   imports =
     [
       ./hardware-configuration.nix
+      ../../modules/common-configuration.nix
     ];
 
   # Bootloader.
@@ -192,6 +193,9 @@ programs.steam = {
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # The secret is encrypted to this user's GitHub SSH key.
+  age.identityPaths = [ "/home/${envs.mainUser}/.ssh/id_github" ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

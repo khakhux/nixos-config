@@ -1,18 +1,16 @@
 # modules/common-configuration.nix
-{ config, pkgs, interfaceName, ipAddress, extraGroups, ... }:
+{ config, lib, pkgs, ... }@args:
 
 let
-  staticNetwork = import ./static-network.nix {
-    inherit interfaceName ipAddress;
-  };
+  interfaceName = args.interfaceName or null;
+  ipAddress = args.ipAddress or null;
+  extraGroups = args.extraGroups or [];
   users = import ../users.nix;
 in
 
 {
-  imports = [
-    staticNetwork
-    ./hardened-ssh.nix
-  ];
+  imports = lib.optional (interfaceName != null && ipAddress != null)
+    (import ./static-network.nix { inherit interfaceName ipAddress; });
   
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -38,11 +36,7 @@ in
 
   users.users.${users.mainUser} = {
     isNormalUser = true;
-    extraGroups = [ "wheel" extraGroups ]; # Enable 'sudo' for the user.
-    openssh.authorizedKeys.keyFiles = [
-      ../ssh-keys/id_yubikey_usbc.pub
-      ../ssh-keys/id_yubikey_usba.pub
-    ];
+    extraGroups = [ "wheel" ] ++ lib.toList extraGroups; # Enable 'sudo' for the user.
     packages = with pkgs; [
       tree
     ];
@@ -61,12 +55,9 @@ in
     usbutils
   ];
 
-  #networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 ];
-
   age.secrets.github-token = {
     file = ../secrets/github-token.age;
-    owner = envs.mainUser;
+    owner = users.mainUser;
     mode = "0400";
   };
 

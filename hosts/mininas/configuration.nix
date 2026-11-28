@@ -17,6 +17,7 @@ in
         ipAddress = ips.mininas;
         extraGroups = "docker";
       })
+      ../../modules/ssh-server.nix
       ../../modules/docker.nix
       ../../services/radicale.nix
       #(import ./syncthing.nix mainUser)
