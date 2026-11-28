@@ -1,6 +1,6 @@
 # NixOS configuration
 
-Personal NixOS flake. The only configured host is `currolaptop`, running NixOS-WSL on Windows. The repository also contains reusable modules and templates, but the live host configuration is in `hosts/currolaptop/` and `modules-dev/`.
+Personal NixOS flake. The active hosts are `currolaptop` (NixOS-WSL), `mininas` (server), and `minipc-n150` (desktop). Other host directories are legacy or incomplete; see [hosts/README.md](hosts/README.md). Shared settings live in `modules/` and `modules-dev/`.
 
 For routine Nix input and system updates, see [nix-update.md](nix-update.md). Agent-facing architecture and maintenance notes are in [AGENTS.md](AGENTS.md).
 
@@ -10,67 +10,44 @@ For routine Nix input and system updates, see [nix-update.md](nix-update.md). Ag
 .
 ├── flake.nix
 ├── hosts/
-│   └── currolaptop/
-│       ├── configuration.nix
-│       ├── home.nix
-│       └── user.nix             # mainUser, hostname, gitUser, gitEmail
+│   ├── currolaptop/             # WSL development host
+│   ├── servers/
+│   │   ├── mininas/
+│   │   └── server-docker-01/    # incomplete legacy host
+│   └── desktops/
+│       ├── minipc-n150/
+│       ├── minipc-n100/
+│       ├── desktop-qtile/
+│       └── proxmox-desktop/
 ├── modules-dev/
-│   ├── configuration.nix       # active system settings
-│   ├── home.nix                 # shared Home Manager settings
+│   ├── configuration.nix       # WSL development system settings
+│   ├── home.nix                 # WSL development Home Manager settings
 │   ├── home/programs/ssh/work.nix
 │   └── cacerts/
 ├── modules/
+│   ├── common-configuration.nix # shared system settings and GitHub token
+│   ├── server.nix               # common + SSH server + static networking
+│   ├── desktop.nix              # common desktop system settings
+│   ├── ssh-server.nix           # hardened SSH, authorized keys, port 22
 │   ├── home/programs/ssh/       # common and desktop SSH blocks
-│   ├── nvim/
-│   ├── docker.nix
-│   └── wsl.nix
+│   ├── nvim/                    # neovim config
+│   ├── docker.nix               # docker engine config
+│   └── wsl.nix                  # wsl config
 ├── dev-envs/java21/
 ├── secrets/
 │   ├── agenix-rules.nix        # agenix recipients
-│   └── github-token.age
-└── scripts/update-opencode.sh
+│   └── github-token.age        # github access token for `nix flake update` api usage limits
+└── scripts/
+    └── check-fast.sh           # simple nixos config test
 ```
 
 `hosts/currolaptop/user.nix` is a plain Nix attrset, not a NixOS module. The host's `home.nix` imports it for host-specific settings and passes its path to `modules-dev/home.nix` as `envFilePath`. The shared home module imports it for common user configuration and imports the work SSH module.
 
-## SSH configuration
+## Shared system and SSH configuration
 
-### Rationale
+`modules/common-configuration.nix` supplies settings shared by native hosts, including the agenix GitHub token used by Nix. `modules/server.nix` adds `modules/ssh-server.nix` (hardened OpenSSH, authorized keys, and SSH firewall access) and static networking; each server passes its own interface and IP address. `modules/desktop.nix` currently imports only the common module. `minipc-n150` sets its agenix decryption identity in its host configuration. The flake selects `hosts/servers/<name>/` or `hosts/desktops/<name>/` through `hostGroup`, while `currolaptop` remains directly under `hosts/`.
 
-SSH configuration is split by scope:
-
-- `modules/home/programs/ssh/common.nix` defines common hosts.
-- `modules/home/programs/ssh/desktop.nix` defines home-network hosts.
-- `modules-dev/home/programs/ssh/work.nix` defines the work GitLab host and gets its login from `gitUser` in `hosts/currolaptop/user.nix`.
-
-Home Manager uses `programs.ssh.matchBlocks` for these host definitions. Use lowercase option names such as `hostname`, `user`, `identityFile`, and `identitiesOnly`; `programs.ssh.settings` is not an option in the pinned Home Manager release.
-
-### Files structure
-
-```text
-modules/
-└── home/
-    ├── common-home.nix (imports common.nix)
-    └── programs/
-        └── ssh/
-            ├── common.nix (ssh common config and github) (we could move ssh settings to ssh-settings.nix)
-            └── desktop.nix (mininas, raspberry)
-modules-dev/
-└── home/
-    ├── home.nix (imports work.nix)
-    └── programs/
-        └── ssh/
-            └── work.nix (gitlab)
-hosts/
-├── currolaptop/
-│   └── home.nix (imports common.nix and desktop.nix; work.nix via modules-dev/home.nix)
-├── desktops/
-│   └── minipc-n150/
-│       └── home.nix (imports desktop.nix; common.nix via modules/common-home.nix)
-└── servers/
-    └── mininas/
-        └── home.nix (imports common.nix via modules/common-home.nix)
-```
+SSH *client* settings are separate Home Manager modules: `modules/home/programs/ssh/common.nix` and `desktop.nix` define personal and home-network hosts; `modules-dev/home/programs/ssh/work.nix` defines the work GitLab host. Home Manager uses `programs.ssh.matchBlocks` with lowercase keys such as `hostname`, `user`, `identityFile`, and `identitiesOnly`.
 
 ## Apply the configuration
 
@@ -99,7 +76,7 @@ Server and desktop configurations are under `hosts/servers/` and
 `hosts/README.md` for active hosts. The NixOS-WSL module is loaded only for
 `currolaptop`.
 
-There is no CI or test suite. For lightweight validation of Nix edits, parse changed files with `nix-instantiate --parse` and evaluate relevant configuration attributes with `nix eval`. The full system validation is a successful `nixos-rebuild switch`.
+There is no CI or full test suite. After confirming `hostname` matches the intended flake target, use `nix eval` for host-specific checks. For changed Nix and shell files, run the fast parse/format/lint checks documented in [hosts/README.md](hosts/README.md). The full system validation is a successful `nixos-rebuild switch`.
 
 ## Corporate Docker registry
 
@@ -134,7 +111,7 @@ idea-java21
 
 ## Add secrets
 
-Currently this system uses [agenix](https://github.com/ryantm/agenix/) to manage secrets such as github token to be used on `nix flake update`.
+This flake uses [agenix](https://github.com/ryantm/agenix/) for secrets, including the GitHub token used by `nix flake update`. Native hosts declare the token in `modules/common-configuration.nix`; `currolaptop` declares it in `modules-dev/configuration.nix`.
 
 Private keys and other more sensible data are not included in the repo, with or without agenix.
 
@@ -188,11 +165,13 @@ sudo -u cacu test -r /run/agenix/github-token && echo "GitHub token secret is re
 
 ### 3. Configure token usage
 
-modules-dev/configuration.nix
+The shared native-host module is `modules/common-configuration.nix`; `modules-dev/configuration.nix` has the same setup for `currolaptop`. The decrypted token must be readable by Nix, and each host needs an agenix identity matching a recipient in `secrets/agenix-rules.nix`.
+
 ```nix
+  # In modules/common-configuration.nix:
   age.secrets.github-token = {
     file = ../secrets/github-token.age;
-    owner = envs.mainUser;
+    owner = users.mainUser;
     mode = "0400";
   };
 
